@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -83,10 +85,10 @@ export function OrderFlow() {
   }, [builder]);
 
   useEffect(() => {
-    if (!currentCustomOptions.includes(selectedCustomOption)) {
-      setSelectedCustomOption(currentCustomOptions[0]);
-    }
-  }, [currentCustomOptions, selectedCustomOption]);
+    setSelectedCustomOption((prev) => 
+      currentCustomOptions.includes(prev) ? prev : currentCustomOptions[0]
+    );
+  }, [currentCustomOptions]);
 
   useEffect(() => {
     if (treatChoice === "classic") {
@@ -234,12 +236,12 @@ export function OrderFlow() {
       <AnimatePresence mode="wait">
         {step === "welcome" && (
           <motion.section key="welcome" {...fade} className="flex flex-1 flex-col justify-center">
-            <p className="text-amber-100/80">CHC Experience</p>
-            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Tell us your nickname first.</h1>
+            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
+            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Tell us your nickname and personalized your cup.</h1>
             <p className="mt-4 max-w-xl text-amber-100/75">Then you can choose your treat from image cards.</p>
             <div className="mt-8 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
               <label className="text-sm text-amber-50">
-                Nickname
+                Your nickname
                 <input
                   value={draftName}
                   onChange={(event) => setDraftName(event.target.value)}
@@ -263,10 +265,10 @@ export function OrderFlow() {
 
         {step === "form" && (
           <motion.section key="form" {...fade} className="flex flex-1 flex-col">
-            <p className="text-amber-100/80">CHC Experience</p>
-            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Build your treat with images.</h1>
-            <p className="mt-4 max-w-2xl text-amber-100/75">
-              Hi {nickname}, choose your CHC treat and customize with image cards, then place your order.
+            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
+            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Make an order you truly deserved.</h1>
+            <p className="mt-4 max-w-4xl text-amber-100/75">
+              Hi {nickname}, choose your Cadbury Hot Chocolate treat and customize the drink you deserve, then place your order.
             </p>
 
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
@@ -305,7 +307,7 @@ export function OrderFlow() {
               {treatChoice === "signature" && (
                 <div>
                   <p className="text-sm text-amber-50">Pick a signature treat</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-4">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
                       const image = getSignatureImage(item.id);
@@ -333,7 +335,7 @@ export function OrderFlow() {
               {(treatChoice === "custom-ice-cream" || treatChoice === "custom-milkshake") && (
                 <div>
                   <p className="text-sm text-amber-50">Choose your add-on</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-5">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
                       return (
@@ -403,7 +405,7 @@ export function OrderFlow() {
                 disabled={placedOrder.status !== "Completed"}
                 onClick={() => setHasCollectedDrink(true)}
               >
-                I've taken my drink
+                I have taken my drink
               </RippleButton>
             </div>
             <div className="mt-3 flex justify-center">

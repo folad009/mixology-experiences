@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -65,9 +66,10 @@ export default function AdminPage() {
   }, [orders]);
 
   return (
-    <main className="min-h-screen bg-[#1b120c] px-4 py-6 text-amber-50 sm:px-8">
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#6A00C9_0%,#6101BB_25%,#40007A_60%,#29034E_100%)] px-4 py-6 text-amber-50 sm:px-8">
       <div className="mx-auto w-full max-w-6xl">
-        <h1 className="text-3xl font-bold">CHC Admin Dashboard</h1>
+        <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
+        <h1 className="text-3xl font-bold">CHC Order Screen</h1>
         <p className="mt-2 text-amber-100/75">Realtime order queue for live experiential events.</p>
         <div className="mt-4 grid grid-cols-3 gap-3">
           <StatCard label="Pending" value={groupedCount.pending} />

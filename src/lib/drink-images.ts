@@ -1,14 +1,14 @@
 export const DRINK_IMAGES = {
   classic: {
-    src: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Classic hot chocolate in a cup",
   },
   signatureDoubleChocoCrunch: {
-    src: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Rich chocolate ice cream dessert",
   },
   signatureChocoCaramelDrip: {
-    src: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Chocolate drink with caramel drizzle",
   },
   signatureChocoCoffeeKick: {
@@ -20,11 +20,11 @@ export const DRINK_IMAGES = {
     alt: "Berry and chocolate layered shake",
   },
   customIceCream: {
-    src: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Customizable chocolate ice cream bowl",
   },
   customMilkshake: {
-    src: "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image2.png",
     alt: "Chocolate milkshake topped with cream",
   },
   ingredient: {

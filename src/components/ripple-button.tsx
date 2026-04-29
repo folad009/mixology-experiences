@@ -13,7 +13,7 @@ export function RippleButton({ className, children, ...props }: Props) {
     <motion.button
       whileTap={{ scale: 0.98 }}
       className={clsx(
-        "relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-200 via-amber-300 to-orange-300 px-5 py-3 font-semibold text-amber-950 shadow-[0_10px_35px_rgba(143,85,44,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60",
+        "relative overflow-hidden rounded-2xl bg-linear-to-r from-[#5800A8]/200 via-[#5800A8]/300 to-[#5800A8] border cursor-pointer px-5 py-3 font-semibold text-white shadow-[0_10px_35px_rgba(143,85,44,0.35)] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60",
         className,
       )}
       {...props}

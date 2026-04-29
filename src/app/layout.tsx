@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CHC Mixlogy Experience",
-  description: "Interactive live event drink ordering and admin dashboard",
+  title: "Cadbury Hot Chocolate",
+  description: "The Treat You Deserve",
 };
 
 export default function RootLayout({
