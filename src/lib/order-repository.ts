@@ -47,7 +47,7 @@ const toFeedback = (row: FeedbackRow): Feedback => ({
   createdAt: new Date(row.created_at).toISOString(),
 });
 
-export async function fetchOrders(status?: OrderStatus) {
+export async function fetchOrders(status?: OrderStatus | "all") {
   const baseQuery = `
     SELECT id, nickname, drink_type, category, drink_name, selections, status, created_at
     FROM orders

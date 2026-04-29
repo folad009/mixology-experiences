@@ -2,9 +2,11 @@
 
 import { motion } from "framer-motion";
 import { clsx } from "clsx";
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement>;
+type Props = Omit<ComponentPropsWithoutRef<typeof motion.button>, "children"> & {
+  children?: ReactNode;
+};
 
 export function RippleButton({ className, children, ...props }: Props) {
   return (
