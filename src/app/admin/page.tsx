@@ -7,6 +7,11 @@ import type { Order, OrderStatus } from "@/lib/types";
 
 const statuses: Array<OrderStatus | "all"> = ["all", "Pending", "Preparing", "Completed"];
 
+function getStatusLabel(status: OrderStatus | "all") {
+  if (status === "Completed") return "Ready";
+  return status;
+}
+
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [status, setStatus] = useState<OrderStatus | "all">("all");
@@ -67,7 +72,7 @@ export default function AdminPage() {
         <div className="mt-4 grid grid-cols-3 gap-3">
           <StatCard label="Pending" value={groupedCount.pending} />
           <StatCard label="Preparing" value={groupedCount.preparing} />
-          <StatCard label="Completed" value={groupedCount.completed} />
+          <StatCard label="Ready" value={groupedCount.completed} />
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {statuses.map((item) => (
@@ -76,7 +81,7 @@ export default function AdminPage() {
               onClick={() => setStatus(item)}
               className={status === item ? "" : "bg-white/20 text-amber-50 shadow-none"}
             >
-              {item}
+              {getStatusLabel(item)}
             </RippleButton>
           ))}
           <RippleButton
@@ -106,11 +111,11 @@ export default function AdminPage() {
                 <h3 className="mt-2 text-xl font-semibold">{order.nickname}</h3>
                 <p className="mt-1 text-amber-100/85">{order.drinkName}</p>
                 <p className="mt-1 text-sm text-amber-100/70">{order.selections.join(", ")}</p>
-                <p className="mt-3 text-sm font-medium">Status: {order.status}</p>
+                <p className="mt-3 text-sm font-medium">Status: {getStatusLabel(order.status)}</p>
                 <div className="mt-4 flex gap-2">
                   <MiniStatusButton onClick={() => updateStatus(order.id, "Pending")}>Pending</MiniStatusButton>
                   <MiniStatusButton onClick={() => updateStatus(order.id, "Preparing")}>Preparing</MiniStatusButton>
-                  <MiniStatusButton onClick={() => updateStatus(order.id, "Completed")}>Completed</MiniStatusButton>
+                  <MiniStatusButton onClick={() => updateStatus(order.id, "Completed")}>Ready</MiniStatusButton>
                 </div>
               </motion.article>
             ))}
@@ -133,7 +138,7 @@ export default function AdminPage() {
                     <td className="p-3">{order.nickname}</td>
                     <td className="p-3">{order.drinkName}</td>
                     <td className="p-3">{order.selections.join(", ")}</td>
-                    <td className="p-3">{order.status}</td>
+                    <td className="p-3">{getStatusLabel(order.status)}</td>
                     <td className="p-3">
                       <select
                         value={order.status}
@@ -142,7 +147,7 @@ export default function AdminPage() {
                       >
                         <option value="Pending">Pending</option>
                         <option value="Preparing">Preparing</option>
-                        <option value="Completed">Completed</option>
+                        <option value="Completed">Ready</option>
                       </select>
                     </td>
                   </tr>
