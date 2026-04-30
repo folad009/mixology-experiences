@@ -66,8 +66,15 @@ export default function AdminPage() {
   }, [orders]);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_center,#6A00C9_0%,#6101BB_25%,#40007A_60%,#29034E_100%)] px-4 py-6 text-amber-50 sm:px-8">
-      <div className="mx-auto w-full max-w-6xl">
+    <main className="relative min-h-screen w-full overflow-hidden text-amber-50">
+      <div
+        className="pointer-events-none absolute inset-0 bg-cover bg-top md:bg-center"
+        style={{ backgroundImage: "url('/images/chc-background.png')" }}
+      />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.34)_0,transparent_58%)] md:bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.24)_0,transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[#2d0b59]/45 md:bg-[#2d0b59]/30" />
+
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:px-8">
         <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-32" />
         <h1 className="text-3xl font-bold">CHC Order Screen</h1>
         <p className="mt-2 text-amber-100/75">Realtime order queue for live experiential events.</p>
