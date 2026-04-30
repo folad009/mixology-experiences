@@ -13,7 +13,7 @@ import { useOrderFlowStore } from "@/lib/order-flow-store";
 import type { DrinkCategory, Order } from "@/lib/types";
 
 type Step = "welcome" | "form" | "success" | "feedback";
-type TreatChoice = "classic" | "signature" | "custom-ice-cream" | "custom-milkshake";
+type TreatChoice = "signature" | "custom-ice-cream" | "custom-milkshake";
 type CustomOption = (typeof CUSTOM_OPTIONS.IceCream)[number] | (typeof CUSTOM_OPTIONS.Milkshake)[number];
 
 const fade = {
@@ -25,8 +25,6 @@ const fade = {
 
 function getTreatChoiceImage(choice: TreatChoice) {
   switch (choice) {
-    case "classic":
-      return DRINK_IMAGES.classic;
     case "signature":
       return DRINK_IMAGES.signatureDoubleChocoCrunch;
     case "custom-ice-cream":
@@ -58,7 +56,7 @@ export function OrderFlow() {
 
   const [step, setStep] = useState<Step>("welcome");
   const [draftName, setDraftName] = useState(nickname);
-  const [treatChoice, setTreatChoice] = useState<TreatChoice>("classic");
+  const [treatChoice, setTreatChoice] = useState<TreatChoice>("signature");
   const [selectedSignatureId, setSelectedSignatureId] = useState(SIGNATURE_DRINKS[0]?.id ?? "");
   const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.IceCream[0]);
   const [loadingOrder, setLoadingOrder] = useState(false);
@@ -91,16 +89,6 @@ export function OrderFlow() {
   }, [currentCustomOptions]);
 
   useEffect(() => {
-    if (treatChoice === "classic") {
-      setBuilder({
-        drinkType: "Classic",
-        category: "IceCream",
-        drinkName: "CHC Classic",
-        selections: ["Classic Hot Chocolate Mix"],
-      });
-      return;
-    }
-
     if (treatChoice === "signature") {
       const drink = SIGNATURE_DRINKS.find((item) => item.id === selectedSignatureId);
       if (!drink || !drink.category) return;
@@ -169,15 +157,14 @@ export function OrderFlow() {
     setStep("welcome");
     setDraftName("");
     setComment("");
-    setTreatChoice("classic");
+    setTreatChoice("signature");
     setSelectedSignatureId(SIGNATURE_DRINKS[0]?.id ?? "");
     setSelectedCustomOption(CUSTOM_OPTIONS.IceCream[0]);
     setHasCollectedDrink(false);
   }
 
   function getSummaryImage() {
-    if (!builder) return DRINK_IMAGES.classic;
-    if (builder.drinkType === "Classic") return DRINK_IMAGES.classic;
+    if (!builder) return DRINK_IMAGES.signatureDoubleChocoCrunch;
     if (builder.drinkType === "Custom") {
       return builder.category === "IceCream" ? DRINK_IMAGES.customIceCream : DRINK_IMAGES.customMilkshake;
     }
@@ -277,7 +264,6 @@ export function OrderFlow() {
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {(
                     [
-                      ["classic", "CHC Classic"],
                       ["signature", "CHC Signature Treat"],
                       ["custom-ice-cream", "CHC Customized Treat - Ice Cream"],
                       ["custom-milkshake", "CHC Customized - Milkshake"],
