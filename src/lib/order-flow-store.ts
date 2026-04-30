@@ -15,7 +15,7 @@ type OrderFlowState = {
   builder: BuilderSelection | null;
   placedOrder: Order | null;
   setNickname: (nickname: string) => void;
-  setBuilder: (builder: BuilderSelection) => void;
+  setBuilder: (builder: BuilderSelection | null) => void;
   setPlacedOrder: (order: Order) => void;
   resetFlow: () => void;
 };

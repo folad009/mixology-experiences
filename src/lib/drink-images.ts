@@ -3,20 +3,24 @@ export const DRINK_IMAGES = {
     src: "/images/chc-image1.png",
     alt: "Classic hot chocolate in a cup",
   },
-  signatureDoubleChocoCrunch: {
+  signatureTreat: {
     src: "/images/chc-image1.png",
     alt: "Rich chocolate ice cream dessert",
   },
+  signatureDoubleChocoCrunch: {
+    src: "/images/chc-image2.png",
+    alt: "Rich chocolate ice cream dessert",
+  },
   signatureChocoCaramelDrip: {
-    src: "/images/chc-image1.png",
+    src: "/images/chc-image2.png",
     alt: "Chocolate drink with caramel drizzle",
   },
   signatureChocoCoffeeKick: {
-    src: "/images/chc-image1.png",
+    src: "/images/chc-image2.png",
     alt: "Coffee chocolate milkshake with cream",
   },
   signatureChocoBerryFusion: {
-    src: "/images/chc-image1.png",
+    src: "/images/chc-image2.png",
     alt: "Berry and chocolate layered shake",
   },
   customIceCream: {

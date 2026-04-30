@@ -26,7 +26,7 @@ const fade = {
 function getTreatChoiceImage(choice: TreatChoice) {
   switch (choice) {
     case "signature":
-      return DRINK_IMAGES.signatureDoubleChocoCrunch;
+      return DRINK_IMAGES.signatureTreat;
     case "custom-ice-cream":
       return DRINK_IMAGES.customIceCream;
     default:
@@ -56,7 +56,7 @@ export function OrderFlow() {
 
   const [step, setStep] = useState<Step>("welcome");
   const [draftName, setDraftName] = useState(nickname);
-  const [treatChoice, setTreatChoice] = useState<TreatChoice>("signature");
+  const [treatChoice, setTreatChoice] = useState<TreatChoice | null>(null);
   const [selectedSignatureId, setSelectedSignatureId] = useState(SIGNATURE_DRINKS[0]?.id ?? "");
   const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.IceCream[0]);
   const [loadingOrder, setLoadingOrder] = useState(false);
@@ -89,6 +89,11 @@ export function OrderFlow() {
   }, [currentCustomOptions]);
 
   useEffect(() => {
+    if (!treatChoice) {
+      setBuilder(null);
+      return;
+    }
+
     if (treatChoice === "signature") {
       const drink = SIGNATURE_DRINKS.find((item) => item.id === selectedSignatureId);
       if (!drink || !drink.category) return;
@@ -157,7 +162,7 @@ export function OrderFlow() {
     setStep("welcome");
     setDraftName("");
     setComment("");
-    setTreatChoice("signature");
+    setTreatChoice(null);
     setSelectedSignatureId(SIGNATURE_DRINKS[0]?.id ?? "");
     setSelectedCustomOption(CUSTOM_OPTIONS.IceCream[0]);
     setHasCollectedDrink(false);
@@ -255,7 +260,7 @@ export function OrderFlow() {
             <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
             <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Make an order you truly deserved.</h1>
             <p className="mt-4 max-w-4xl text-amber-100/75">
-              Hi {nickname}, choose your Cadbury Hot Chocolate treat and customize the drink you deserve, then place your order.
+              Hi {nickname}, choose your Cadbury Hot Chocolate treat.
             </p>
 
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
