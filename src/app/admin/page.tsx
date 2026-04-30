@@ -68,8 +68,12 @@ export default function AdminPage() {
   return (
     <main className="relative min-h-screen w-full overflow-hidden text-amber-50">
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-top md:bg-center"
-        style={{ backgroundImage: "url('/images/chc-background.png')" }}
+        className="pointer-events-none absolute inset-0 bg-no-repeat"
+        style={{
+          backgroundImage: "url('/images/chc-background-new.png')",
+          backgroundPosition: "right center",
+          backgroundSize: "auto 100%",
+        }}
       />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.34)_0,transparent_58%)] md:bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.24)_0,transparent_60%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[#2d0b59]/45 md:bg-[#2d0b59]/30" />

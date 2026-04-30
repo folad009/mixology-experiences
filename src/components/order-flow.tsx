@@ -261,7 +261,7 @@ export function OrderFlow() {
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
               <div>
                 <p className="text-sm text-amber-50">Choose your treat</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   {(
                     [
                       ["signature", "CHC Signature Treat"],
@@ -293,7 +293,7 @@ export function OrderFlow() {
               {treatChoice === "signature" && (
                 <div>
                   <p className="text-sm text-amber-50">Pick a signature treat</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-4">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
                       const image = getSignatureImage(item.id);
@@ -321,7 +321,7 @@ export function OrderFlow() {
               {(treatChoice === "custom-ice-cream" || treatChoice === "custom-milkshake") && (
                 <div>
                   <p className="text-sm text-amber-50">Choose your add-on</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-5">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
                       return (

@@ -12,11 +12,11 @@ export const DRINK_IMAGES = {
     alt: "Chocolate drink with caramel drizzle",
   },
   signatureChocoCoffeeKick: {
-    src: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Coffee chocolate milkshake with cream",
   },
   signatureChocoBerryFusion: {
-    src: "https://images.unsplash.com/photo-1464306076886-da185f6a9d05?auto=format&fit=crop&w=1200&q=80",
+    src: "/images/chc-image1.png",
     alt: "Berry and chocolate layered shake",
   },
   customIceCream: {
@@ -24,7 +24,7 @@ export const DRINK_IMAGES = {
     alt: "Customizable chocolate ice cream bowl",
   },
   customMilkshake: {
-    src: "/images/chc-image2.png",
+    src: "/images/chc-image1.png",
     alt: "Chocolate milkshake topped with cream",
   },
   ingredient: {
