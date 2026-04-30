@@ -70,9 +70,15 @@ export default function AdminPage() {
       <div
         className="pointer-events-none absolute inset-0 bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/chc-background-new.png')",
+          backgroundImage: "url('/images/chc-background-neww.png')",
           backgroundPosition: "right center",
-          backgroundSize: "auto 100%",
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
+          backgroundOrigin: "border-box",
+          backgroundClip: "border-box",
+          backgroundColor: "transparent",
+          backgroundBlendMode: "normal",
         }}
       />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.34)_0,transparent_58%)] md:bg-[radial-gradient(circle_at_top,rgba(172,89,249,0.24)_0,transparent_60%)]" />
