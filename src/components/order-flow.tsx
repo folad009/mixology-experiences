@@ -236,7 +236,7 @@ export function OrderFlow() {
       <AnimatePresence mode="wait">
         {step === "welcome" && (
           <motion.section key="welcome" {...fade} className="flex flex-1 flex-col justify-center">
-            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
+            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-32" />
             <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Tell us your nickname and personalized your cup.</h1>
             <p className="mt-4 max-w-xl text-amber-100/75">Then you can choose your treat from image cards.</p>
             <div className="mt-8 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
