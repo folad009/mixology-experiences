@@ -185,7 +185,7 @@ export default function AdminPage() {
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="bg-white/10">
               <tr>
-                <th className="p-3 font-semibold">Nickname</th>
+                <th className="p-3 font-semibold">Name</th>
                 <th className="p-3 font-semibold">Order</th>
                 <th className="p-3 font-semibold">Time for preparation</th>
                 <th className="p-3 font-semibold">Status</th>

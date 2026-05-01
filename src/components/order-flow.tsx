@@ -45,6 +45,21 @@ function getSignatureImage(drinkId: string) {
   }
 }
 
+function getCustomOptionImage(option: string) {
+  switch (option) {
+    case "Cadbury Chocolate + Caramel Milkshake":
+      return DRINK_IMAGES.ingredient;
+    case "Cadbury Chocolate + Expresso Milkshake":
+      return DRINK_IMAGES.expresso;
+    case "Cadbury Chocolate Milkshake":
+      return DRINK_IMAGES.milkshake;
+    case "Alcohol Infusion":
+      return DRINK_IMAGES.alcoholInfusion;
+    default:
+      return DRINK_IMAGES.ingredient;
+  }
+}
+
 function getStatusLabel(status: Order["status"]) {
   return status === "Completed" ? "Ready" : status;
 }
@@ -178,7 +193,8 @@ export function OrderFlow() {
   function getSummaryImage() {
     if (!builder) return DRINK_IMAGES.signatureDoubleChocoCrunch;
     if (builder.drinkType === "Custom") {
-      return builder.category === "IceCream" ? DRINK_IMAGES.customIceCream : DRINK_IMAGES.customMilkshake;
+      const selectedOption = builder.selections[1] ?? "";
+      return getCustomOptionImage(selectedOption);
     }
     const selectedSignature = SIGNATURE_DRINKS.find((drink) => drink.name === builder.drinkName);
     return getSignatureImage(selectedSignature?.id ?? "cadbury-gelato-choco-chips");
@@ -256,7 +272,7 @@ export function OrderFlow() {
 
             <div className="mt-8 w-full max-w-xl rounded-3xl border border-white/20 bg-white/10 p-5 text-left backdrop-blur-xl sm:p-6">
               <label className="text-sm text-amber-50">
-                Your nickname
+                Name
                 <input
                   value={draftName}
                   onChange={(event) => setDraftName(event.target.value)}
@@ -288,7 +304,7 @@ export function OrderFlow() {
 
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
               <div>
-                <p className="text-sm text-amber-50">Choose your treat</p>
+                
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {(
                     [
@@ -350,6 +366,7 @@ export function OrderFlow() {
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
+                      const image = getCustomOptionImage(option);
                       return (
                         <button
                           key={option}
@@ -361,7 +378,7 @@ export function OrderFlow() {
                               : "border-amber-100/20 bg-black/20 hover:border-amber-200/40"
                           }`}
                         >
-                          <DrinkPhoto src={DRINK_IMAGES.ingredient.src} alt={DRINK_IMAGES.ingredient.alt} />
+                          <DrinkPhoto src={image.src} alt={image.alt} />
                           <p className="mt-2 text-xs capitalize font-semibold text-amber-50">{option}</p>
                         </button>
                       );
@@ -374,7 +391,7 @@ export function OrderFlow() {
             {builder && (
               <div className="mt-6 grid gap-4 rounded-3xl border border-white/20 bg-white/10 p-5 sm:grid-cols-[1.4fr_1fr] sm:items-center">
                 <div>
-                  <p className="text-amber-100">Nickname: {draftName.trim() || "Not set yet"}</p>
+                  <p className="text-amber-100">Name: {draftName.trim() || "Not set yet"}</p>
                   <p className="mt-2 text-amber-100">Drink Type: {drinkTypeLabel}</p>
                   <p className="mt-2 text-amber-100">Selection: {selectionLabel}</p>
                  
