@@ -335,7 +335,7 @@ export function OrderFlow() {
 
               {treatChoice === "signature" && (
                 <div>
-                  <p className="text-sm text-amber-50">Pick a signature gelato treat</p>
+                  <p className="text-sm text-amber-50 font-bold">Pick a signature gelato treat</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
@@ -362,7 +362,7 @@ export function OrderFlow() {
 
               {treatChoice === "custom-milkshake" && (
                 <div>
-                  <p className="text-sm text-amber-50">Pick a signature milkshake treat below</p>
+                  <p className="text-sm text-amber-50 font-bold">Pick a signature milkshake treat below</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
