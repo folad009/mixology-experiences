@@ -280,7 +280,7 @@ export function OrderFlow() {
                   placeholder="Chocolate Legend"
                 />
               </label>
-              <p className="mt-4 max-w-xl text-amber-100/75">Then you can choose your treat from image cards.</p>
+              <p className="mt-4 max-w-xl text-amber-100/75">Click to see image cards</p>
               <RippleButton
                 className="mt-4"
                 disabled={!draftName.trim()}
@@ -299,7 +299,7 @@ export function OrderFlow() {
           <motion.section key="form" {...fade} className="flex flex-1 flex-col mt-16">
             <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-[200px]" />
             <p className="mt-4 max-w-4xl text-amber-100/75 capitalize">
-              Hi {nickname}, choose your Cadbury Chocolate treat.
+              Hi {nickname}, choose your Cadbury Chocolate treat
             </p>
 
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
@@ -335,7 +335,7 @@ export function OrderFlow() {
 
               {treatChoice === "signature" && (
                 <div>
-                  <p className="text-sm text-amber-50">Pick a signature treat</p>
+                  <p className="text-sm text-amber-50">Pick a signature gelato treat</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
@@ -362,7 +362,7 @@ export function OrderFlow() {
 
               {treatChoice === "custom-milkshake" && (
                 <div>
-                  <p className="text-sm text-amber-50">Choose your add-on</p>
+                  <p className="text-sm text-amber-50">Pick a signature milkshake treat below</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
@@ -392,8 +392,8 @@ export function OrderFlow() {
               <div className="mt-6 grid gap-4 rounded-3xl border border-white/20 bg-white/10 p-5 sm:grid-cols-[1.4fr_1fr] sm:items-center">
                 <div>
                   <p className="text-amber-100">Name: {draftName.trim() || "Not set yet"}</p>
-                  <p className="mt-2 text-amber-100">Drink Type: {drinkTypeLabel}</p>
-                  <p className="mt-2 text-amber-100">Selection: {selectionLabel}</p>
+                  <p className="mt-2 text-amber-100">Order: {drinkTypeLabel}</p>
+                  <p className="mt-2 text-amber-100">Add-on Topping: {selectionLabel}</p>
                  
                 </div>
                 <div className="sm:justify-self-end sm:w-full sm:max-w-52">
@@ -421,8 +421,8 @@ export function OrderFlow() {
             >
               Order #{placedOrder.id.slice(0, 6).toUpperCase()}
             </motion.div>
-            <h2 className="mt-5 text-xl sm:text-3xl font-bold text-amber-50 capitalize">
-              Preparing your {placedOrder.drinkName} for {nickname}{" "}
+            <h2 className="mt-5 text-xl sm:text-3xl font-bold text-amber-50">
+              Preparing {placedOrder.drinkName} for {nickname}{" "}
               <motion.span
                 aria-hidden
                 className="inline-block origin-bottom"

@@ -159,7 +159,7 @@ export default function AdminPage() {
       <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-6 sm:px-8">
       <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-[200px] mb-10 mt-10" />
         <h1 className="text-3xl font-bold">Cadbury Chocolate Treat Order Screen</h1>
-        <p className="mt-2 text-amber-100/75">Realtime order queue for live experiential events.</p>
+        <p className="mt-2 text-amber-100/75">Realtime order queue for live experiential events</p>
         <div className="mt-4 grid grid-cols-3 gap-3">
           <StatCard label="Pending" value={groupedCount.pending} />
           <StatCard label="Preparing" value={groupedCount.preparing} />
