@@ -5,10 +5,10 @@ export type OrderStatus = "Pending" | "Preparing" | "Completed";
 export type DrinkOption = {
   id: string;
   name: string;
-  description: string;
   drinkType: DrinkType;
-  category?: DrinkCategory;
+  category: DrinkCategory;
   defaultSelections: string[];
+  description?: string;
 };
 
 export type Order = {

@@ -3,18 +3,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChcShell } from "@/components/chc-shell";
 import { DrinkPhoto } from "@/components/drink-photo";
 import { RippleButton } from "@/components/ripple-button";
 import { DRINK_IMAGES } from "@/lib/drink-images";
-import { CUSTOM_OPTIONS, SIGNATURE_DRINKS } from "@/lib/menu-data";
+import { CUSTOM_OPTIONS, SIGNATURE_DRINKS, TREAT_NAMES } from "@/lib/menu-data";
 import { useOrderFlowStore } from "@/lib/order-flow-store";
 import type { DrinkCategory, Order } from "@/lib/types";
 
 type Step = "welcome" | "form" | "success" | "feedback";
-type TreatChoice = "signature" | "custom-ice-cream" | "custom-milkshake";
-type CustomOption = (typeof CUSTOM_OPTIONS.IceCream)[number] | (typeof CUSTOM_OPTIONS.Milkshake)[number];
+type TreatChoice = "signature" | "custom-milkshake";
+type CustomOption = (typeof CUSTOM_OPTIONS.Milkshake)[number];
 
 const fade = {
   initial: { opacity: 0, y: 14 },
@@ -27,8 +27,6 @@ function getTreatChoiceImage(choice: TreatChoice) {
   switch (choice) {
     case "signature":
       return DRINK_IMAGES.signatureTreat;
-    case "custom-ice-cream":
-      return DRINK_IMAGES.customIceCream;
     default:
       return DRINK_IMAGES.customMilkshake;
   }
@@ -36,11 +34,11 @@ function getTreatChoiceImage(choice: TreatChoice) {
 
 function getSignatureImage(drinkId: string) {
   switch (drinkId) {
-    case "double-choco-crunch":
+    case "cadbury-gelato-choco-chips":
       return DRINK_IMAGES.signatureDoubleChocoCrunch;
-    case "choco-caramel-drip":
+    case "cadbury-gelato-brownies":
       return DRINK_IMAGES.signatureChocoCaramelDrip;
-    case "choco-coffee-kick":
+    case "alcohol-infusion":
       return DRINK_IMAGES.signatureChocoCoffeeKick;
     default:
       return DRINK_IMAGES.signatureChocoBerryFusion;
@@ -58,7 +56,7 @@ export function OrderFlow() {
   const [draftName, setDraftName] = useState(nickname);
   const [treatChoice, setTreatChoice] = useState<TreatChoice | null>(null);
   const [selectedSignatureId, setSelectedSignatureId] = useState(SIGNATURE_DRINKS[0]?.id ?? "");
-  const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.IceCream[0]);
+  const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.Milkshake[0]);
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [rating, setRating] = useState(5);
   const [taste, setTaste] = useState(5);
@@ -69,17 +67,26 @@ export function OrderFlow() {
   const [showReadyToast, setShowReadyToast] = useState(false);
   const [hasCollectedDrink, setHasCollectedDrink] = useState(false);
   const readyToastShownRef = useRef(false);
+  const reduceMotion = useReducedMotion();
 
-  const customCategory: DrinkCategory = treatChoice === "custom-milkshake" ? "Milkshake" : "IceCream";
+  const customCategory: DrinkCategory = "Milkshake";
 
   const currentCustomOptions = useMemo<readonly CustomOption[]>(
-    () => (customCategory === "Milkshake" ? CUSTOM_OPTIONS.Milkshake : CUSTOM_OPTIONS.IceCream),
-    [customCategory],
+    () => CUSTOM_OPTIONS.Milkshake,
+    [],
   );
 
-  const preview = useMemo(() => {
-    if (!builder) return "Choose your premium treat to preview ingredients.";
-    return `${builder.drinkName}: ${builder.selections.join(" + ")}`;
+  const drinkTypeLabel = useMemo(() => {
+    if (!builder) return "";
+    if (builder.drinkType === "Signature") return TREAT_NAMES.signatureGelato;
+    if (builder.drinkType === "Custom") return TREAT_NAMES.signatureMilkshake;
+    return builder.drinkType;
+  }, [builder]);
+
+  const selectionLabel = useMemo(() => {
+    if (!builder) return "";
+    if (builder.drinkType === "Custom") return builder.selections[1] ?? builder.drinkName;
+    return builder.drinkName;
   }, [builder]);
 
   useEffect(() => {
@@ -96,7 +103,7 @@ export function OrderFlow() {
 
     if (treatChoice === "signature") {
       const drink = SIGNATURE_DRINKS.find((item) => item.id === selectedSignatureId);
-      if (!drink || !drink.category) return;
+      if (!drink) return;
       setBuilder({
         drinkType: "Signature",
         category: drink.category,
@@ -106,11 +113,11 @@ export function OrderFlow() {
       return;
     }
 
-    const base = customCategory === "IceCream" ? "Chocolate Ice Cream" : "Hot Chocolate";
+    const base = "Hot Chocolate";
     setBuilder({
       drinkType: "Custom",
       category: customCategory,
-      drinkName: `CHC Customized ${customCategory}`,
+      drinkName: TREAT_NAMES.signatureMilkshake,
       selections: [base, selectedCustomOption],
     });
   }, [customCategory, selectedCustomOption, selectedSignatureId, setBuilder, treatChoice]);
@@ -164,7 +171,7 @@ export function OrderFlow() {
     setComment("");
     setTreatChoice(null);
     setSelectedSignatureId(SIGNATURE_DRINKS[0]?.id ?? "");
-    setSelectedCustomOption(CUSTOM_OPTIONS.IceCream[0]);
+    setSelectedCustomOption(CUSTOM_OPTIONS.Milkshake[0]);
     setHasCollectedDrink(false);
   }
 
@@ -174,7 +181,7 @@ export function OrderFlow() {
       return builder.category === "IceCream" ? DRINK_IMAGES.customIceCream : DRINK_IMAGES.customMilkshake;
     }
     const selectedSignature = SIGNATURE_DRINKS.find((drink) => drink.name === builder.drinkName);
-    return getSignatureImage(selectedSignature?.id ?? "double-choco-crunch");
+    return getSignatureImage(selectedSignature?.id ?? "cadbury-gelato-choco-chips");
   }
 
   useEffect(() => {
@@ -202,6 +209,22 @@ export function OrderFlow() {
 
   return (
     <ChcShell>
+      <motion.img
+        src="/images/chc-image2.png"
+        alt="Cadbury sachet pack"
+        aria-hidden
+        className="pointer-events-none absolute bottom-6 left-1/2 z-0 w-32 -translate-x-1/2 sm:bottom-1 sm:w-36 sm:opacity-50 md:fixed md:bottom-auto md:left-auto md:right-0 md:top-1/2 md:w-80 md:translate-x-0 md:-translate-y-1/2 md:opacity-85 xl:right-4"
+        animate={
+          reduceMotion
+            ? { opacity: 0.85 }
+            : { y: [0, -12, 0], rotate: [0, -2, 2, 0], scale: [1, 1.02, 1] }
+        }
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { duration: 5, repeat: Infinity, ease: "easeInOut" }
+        }
+      />
       <AnimatePresence>
         {showReadyToast && (
           <motion.div
@@ -227,11 +250,11 @@ export function OrderFlow() {
       </AnimatePresence>
       <AnimatePresence mode="wait">
         {step === "welcome" && (
-          <motion.section key="welcome" {...fade} className="flex flex-1 flex-col justify-center">
-            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-32" />
-            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Tell us your nickname and personalized your cup.</h1>
-            <p className="mt-4 max-w-xl text-amber-100/75">Then you can choose your treat from image cards.</p>
-            <div className="mt-8 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
+          <motion.section key="welcome" {...fade} className="flex flex-1 flex-col items-center justify-center">
+            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Logo" className="mx-auto h-16 w-[200px]" />
+            <h1 className="mt-3 text-center text-4xl font-bold text-amber-50 sm:text-5xl capitalize">Choose your treat</h1>
+
+            <div className="mt-8 w-full max-w-xl rounded-3xl border border-white/20 bg-white/10 p-5 text-left backdrop-blur-xl sm:p-6">
               <label className="text-sm text-amber-50">
                 Your nickname
                 <input
@@ -241,6 +264,7 @@ export function OrderFlow() {
                   placeholder="Chocolate Legend"
                 />
               </label>
+              <p className="mt-4 max-w-xl text-amber-100/75">Then you can choose your treat from image cards.</p>
               <RippleButton
                 className="mt-4"
                 disabled={!draftName.trim()}
@@ -256,22 +280,20 @@ export function OrderFlow() {
         )}
 
         {step === "form" && (
-          <motion.section key="form" {...fade} className="flex flex-1 flex-col">
-            <img src="/images/chc-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-25" />
-            <h1 className="mt-3 text-4xl font-bold text-amber-50 sm:text-5xl">Make an order you truly deserved.</h1>
-            <p className="mt-4 max-w-4xl text-amber-100/75">
-              Hi {nickname}, choose your Cadbury Hot Chocolate treat.
+          <motion.section key="form" {...fade} className="flex flex-1 flex-col mt-16">
+            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-[200px]" />
+            <p className="mt-4 max-w-4xl text-amber-100/75 capitalize">
+              Hi {nickname}, choose your Cadbury Chocolate treat.
             </p>
 
             <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
               <div>
                 <p className="text-sm text-amber-50">Choose your treat</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {(
                     [
-                      ["signature", "CHC Signature Treat"],
-                      ["custom-ice-cream", "CHC Customized Treat - Ice Cream"],
-                      ["custom-milkshake", "CHC Customized - Milkshake"],
+                      ["signature", TREAT_NAMES.signatureGelato],
+                      ["custom-milkshake", TREAT_NAMES.signatureMilkshake],
                     ] as const
                   ).map(([choice, label]) => {
                     const selected = treatChoice === choice;
@@ -298,7 +320,7 @@ export function OrderFlow() {
               {treatChoice === "signature" && (
                 <div>
                   <p className="text-sm text-amber-50">Pick a signature treat</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
                       const image = getSignatureImage(item.id);
@@ -307,7 +329,7 @@ export function OrderFlow() {
                           key={item.id}
                           type="button"
                           onClick={() => setSelectedSignatureId(item.id)}
-                          className={`rounded-2xl border p-3 text-left transition ${
+                          className={`rounded-xl border p-2.5 text-center transition ${
                             selected
                               ? "border-amber-300 bg-amber-200/15 ring-2 ring-amber-300/50"
                               : "border-amber-100/20 bg-black/20 hover:border-amber-200/40"
@@ -315,7 +337,6 @@ export function OrderFlow() {
                         >
                           <DrinkPhoto src={image.src} alt={image.alt} />
                           <p className="mt-2 text-sm font-semibold text-amber-50">{item.name}</p>
-                          <p className="text-xs text-amber-100/80">{item.description}</p>
                         </button>
                       );
                     })}
@@ -323,7 +344,7 @@ export function OrderFlow() {
                 </div>
               )}
 
-              {(treatChoice === "custom-ice-cream" || treatChoice === "custom-milkshake") && (
+              {treatChoice === "custom-milkshake" && (
                 <div>
                   <p className="text-sm text-amber-50">Choose your add-on</p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -341,7 +362,7 @@ export function OrderFlow() {
                           }`}
                         >
                           <DrinkPhoto src={DRINK_IMAGES.ingredient.src} alt={DRINK_IMAGES.ingredient.alt} />
-                          <p className="mt-2 text-sm font-semibold text-amber-50">{option}</p>
+                          <p className="mt-2 text-xs capitalize font-semibold text-amber-50">{option}</p>
                         </button>
                       );
                     })}
@@ -354,10 +375,9 @@ export function OrderFlow() {
               <div className="mt-6 grid gap-4 rounded-3xl border border-white/20 bg-white/10 p-5 sm:grid-cols-[1.4fr_1fr] sm:items-center">
                 <div>
                   <p className="text-amber-100">Nickname: {draftName.trim() || "Not set yet"}</p>
-                  <p className="mt-2 text-amber-100">Drink Type: {builder.drinkType}</p>
-                  <p className="mt-2 text-amber-100">Category: {builder.category}</p>
-                  <p className="mt-2 text-amber-100">Selection: {builder.selections.join(", ")}</p>
-                  <p className="mt-2 text-sm text-amber-100/80">Preview: {preview}</p>
+                  <p className="mt-2 text-amber-100">Drink Type: {drinkTypeLabel}</p>
+                  <p className="mt-2 text-amber-100">Selection: {selectionLabel}</p>
+                 
                 </div>
                 <div className="sm:justify-self-end sm:w-full sm:max-w-52">
                   <DrinkPhoto src={getSummaryImage().src} alt={getSummaryImage().alt} />
@@ -367,7 +387,7 @@ export function OrderFlow() {
 
             <div className="mt-6">
               <RippleButton disabled={loadingOrder || !builder} onClick={placeOrder}>
-                {loadingOrder ? "Pouring your treat..." : "Place Order"}
+                {loadingOrder ? "Pouring your treat..." : "Submit Order"}
               </RippleButton>
             </div>
           </motion.section>
@@ -375,6 +395,7 @@ export function OrderFlow() {
 
         {step === "success" && placedOrder && (
           <motion.section key="success" {...fade} className="flex flex-1 flex-col justify-center text-center">
+            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="mx-auto h-16 w-[200px] mb-10" />
             <motion.div
               initial={{ scale: 0.7, rotate: -4 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -383,10 +404,26 @@ export function OrderFlow() {
             >
               Order #{placedOrder.id.slice(0, 6).toUpperCase()}
             </motion.div>
-            <h2 className="mt-5 text-3xl font-bold text-amber-50">
-              Preparing your {placedOrder.drinkName} for {nickname} ☕
+            <h2 className="mt-5 text-xl sm:text-3xl font-bold text-amber-50 capitalize">
+              Preparing your {placedOrder.drinkName} for {nickname}{" "}
+              <motion.span
+                aria-hidden
+                className="inline-block origin-bottom"
+                animate={
+                  reduceMotion
+                    ? { opacity: 1 }
+                    : { y: [0, -7, 0], rotate: [0, -6, 6, 0], scale: [1, 1.08, 1] }
+                }
+                transition={
+                  reduceMotion
+                    ? { duration: 0 }
+                    : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+                }
+              >
+                ☕
+              </motion.span>
             </h2>
-            <p className="mt-3 text-amber-100/70">Our chocolatiers are crafting the perfect pour.</p>
+            
             <p className="mt-2 text-sm text-amber-100/70">
               Status: <span className="font-semibold">{getStatusLabel(placedOrder.status)}</span>
             </p>
@@ -412,6 +449,8 @@ export function OrderFlow() {
 
         {step === "feedback" && (
           <motion.section key="feedback" {...fade} className="flex flex-1 flex-col">
+            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="mx-auto h-16 w-[200px] mb-10" />
+
             <h2 className="text-3xl font-bold text-amber-50">Rate your CHC experience</h2>
             <div className="mt-6 rounded-3xl border border-white/20 bg-white/10 p-5">
               <Range title="Overall rating" value={rating} onChange={setRating} />
