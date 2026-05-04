@@ -610,7 +610,7 @@ export function OrderFlow() {
             <ComicPanel className="mx-auto mt-5 flex max-w-md flex-col items-center text-center">
               <ComicBadge>Status bubble</ComicBadge>
               <p className="mt-1 font-sans text-amber-100">
-                <span className="font-black text-amber-200">Now playing:</span>{" "}
+                <span className="font-black text-amber-200">Status:</span>{" "}
                 <span className="font-semibold">{getStatusLabel(placedOrder.status)}</span>
               </p>
             </ComicPanel>

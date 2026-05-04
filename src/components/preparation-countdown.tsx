@@ -20,7 +20,12 @@ export type PreparationCountdownProps = {
 };
 
 export function PreparationCountdown({ order, className }: PreparationCountdownProps) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNow(Date.now());
+  }, []);
 
   useEffect(() => {
     if (order.status === "Completed") return;
@@ -44,6 +49,7 @@ export function PreparationCountdown({ order, className }: PreparationCountdownP
     <span
       className={clsx(overdue && "font-medium text-rose-300", className)}
       aria-label={overdue ? "Preparation time exceeded" : `${formatPrepRemaining(remaining)} remaining`}
+      suppressHydrationWarning
     >
       {formatPrepRemaining(remaining)}
     </span>
