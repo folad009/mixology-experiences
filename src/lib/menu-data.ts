@@ -19,14 +19,7 @@ export const SIGNATURE_DRINKS: DrinkOption[] = [
     drinkType: "Signature",
     category: "IceCream",
     defaultSelections: ["Cadbury Chocolate Gelato", "Brownies"],
-  },
-  {
-    id: "alcohol-infusion",
-    name: "Alcohol Infusion",
-    drinkType: "Signature",
-    category: "IceCream",
-    defaultSelections: ["Cadbury Chocolate Gelato", "Alcohol Infusion"],
-  },
+  }
 ];
 
 export const CUSTOM_OPTIONS = {
@@ -35,6 +28,5 @@ export const CUSTOM_OPTIONS = {
     "Cadbury Chocolate + Caramel Milkshake",
     "Cadbury Chocolate + Expresso Milkshake",
     "Cadbury Chocolate Milkshake",
-    "Alcohol Infusion",
   ],
 } as const;

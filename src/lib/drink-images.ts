@@ -8,11 +8,11 @@ export const DRINK_IMAGES = {
     alt: "Rich chocolate ice cream dessert",
   },
   signatureDoubleChocoCrunch: {
-    src: "/images/gelato-choco-chips.png",
+    src: "/images/chc-gelato-img.jpeg",
     alt: "Rich chocolate ice cream dessert",
   },
   signatureChocoCaramelDrip: {
-    src: "/images/gelato-brownies.png",
+    src: "/images/chc-gelato-img.jpeg",
     alt: "Chocolate drink with caramel drizzle",
   },
   signatureChocoCoffeeKick: {
@@ -20,11 +20,11 @@ export const DRINK_IMAGES = {
     alt: "Coffee chocolate milkshake with cream",
   },
   signatureChocoBerryFusion: {
-    src: "/images/gelato-choco-chips.png",
+    src: "/images/chc-gelato-img.jpeg",
     alt: "Berry and chocolate layered shake",
   },
   customIceCream: {
-    src: "/images/gelato-choco-chips.png",
+    src: "/images/chc-gelato-img.jpeg",
     alt: "Customizable chocolate ice cream bowl",
   },
   customMilkshake: {
@@ -32,15 +32,15 @@ export const DRINK_IMAGES = {
     alt: "Chocolate milkshake topped with cream",
   },
   ingredient: {
-    src: "/images/cadbury-milkshare.png",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   expresso: {
-    src: "/images/expresso-milkshare.png",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Expresso Milkshake",
   },
   milkshake: {
-    src: "/images/chocolate-milkshare.png",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   alcoholInfusion: {

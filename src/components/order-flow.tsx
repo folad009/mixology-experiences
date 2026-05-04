@@ -2,10 +2,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import clsx from "clsx";
+import { Bangers } from "next/font/google";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChcShell } from "@/components/chc-shell";
 import { DrinkPhoto } from "@/components/drink-photo";
+import { PreparationCountdown } from "@/components/preparation-countdown";
 import { RippleButton } from "@/components/ripple-button";
 import { DRINK_IMAGES } from "@/lib/drink-images";
 import { CUSTOM_OPTIONS, SIGNATURE_DRINKS, TREAT_NAMES } from "@/lib/menu-data";
@@ -15,6 +18,82 @@ import type { DrinkCategory, Order } from "@/lib/types";
 type Step = "welcome" | "form" | "success" | "feedback";
 type TreatChoice = "signature" | "custom-milkshake";
 type CustomOption = (typeof CUSTOM_OPTIONS.Milkshake)[number];
+
+const bangers = Bangers({
+  weight: "400",
+  subsets: ["latin"],
+});
+
+function ComicPanel({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div
+      className={clsx(
+        "rounded-[1.35rem] border-[3px] border-dashed border-amber-100/55 bg-white/[0.07] p-5 shadow-[6px_6px_0_rgba(12,0,32,0.55)] backdrop-blur-xl sm:rounded-[1.65rem] sm:p-6",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ComicBadge({ children }: { children: ReactNode }) {
+  return (
+    <span className="mb-2 mx-auto inline-block -rotate-1 rounded-md border-2 border-amber-950/35 bg-[#ffe566] px-2.5 py-0.5 text-[0.62rem] font-black uppercase tracking-[0.14em] text-[#3a0858] shadow-[2px_2px_0_rgba(0,0,0,0.22)]">
+      {children}
+    </span>
+  );
+}
+
+function ComicHeroGreeting({
+  nickname,
+  variant = "order",
+}: {
+  nickname: string;
+  variant?: "order" | "feedback";
+}) {
+  const isFeedback = variant === "feedback";
+  return (
+    <div className="relative mx-auto mt-2 max-w-xl px-1">
+      <div className="relative z-10">
+        <div
+          className={clsx(
+            bangers.className,
+            "relative rounded-[1.75rem] border-[3px] border-[#1a0528] bg-[#fff9e6] px-5 py-4 text-center text-2xl leading-tight tracking-wide text-[#4a0b6e] shadow-[8px_8px_0_rgba(0,0,0,0.38)] sm:px-7 sm:py-5 sm:text-4xl",
+          )}
+          style={{ textShadow: "2px 2px 0 rgba(250,204,21,0.35)" }}
+        >
+          <span className="text-[#db2777]" aria-hidden>
+            ★{" "}
+          </span>
+          {isFeedback ? `You crushed it, ${nickname}!` : `Hi ${nickname}!`}
+          <span className="text-[#db2777]" aria-hidden>
+            {" "}
+            ★
+          </span>
+          <span className="mt-2 block font-sans text-sm font-semibold normal-case tracking-normal text-[#5b2175] sm:text-base">
+            {isFeedback
+              ? "One more scene: rate the CHC experience so we can brag in the next issue"
+              : "Choose your Cadbury chocolate treat"}
+          </span>
+        </div>
+        <svg
+          className="absolute -bottom-[10px] left-[14%] z-20 h-[14px] w-12 text-[#fff9e6] drop-shadow-[2px_3px_0_#1a0528]"
+          viewBox="0 0 48 16"
+          aria-hidden
+        >
+          <path
+            fill="currentColor"
+            stroke="#1a0528"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            d="M4 0h40L24 14z"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 const fade = {
   initial: { opacity: 0, y: 14 },
@@ -202,17 +281,20 @@ export function OrderFlow() {
 
   useEffect(() => {
     if (!placedOrder?.id) return;
-    if (readyToastShownRef.current) return;
+
+    readyToastShownRef.current = false;
 
     const timer = setInterval(async () => {
       try {
         const response = await fetch(`/api/orders/${placedOrder.id}`);
         if (!response.ok) return;
         const data = (await response.json()) as { order: Order };
+        setPlacedOrder(data.order);
         if (data.order.status === "Completed") {
-          setPlacedOrder(data.order);
-          setShowReadyToast(true);
-          readyToastShownRef.current = true;
+          if (!readyToastShownRef.current) {
+            setShowReadyToast(true);
+            readyToastShownRef.current = true;
+          }
           clearInterval(timer);
         }
       } catch (error) {
@@ -247,18 +329,24 @@ export function OrderFlow() {
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
-            className="fixed bottom-6 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-emerald-200/30 bg-emerald-500/20 px-4 py-3 text-emerald-50 backdrop-blur-xl"
+            className="fixed bottom-6 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 rounded-[1.25rem] border-[3px] border-emerald-950/40 bg-[#ecfdf5]/95 px-4 py-3 text-[#064e3b] shadow-[6px_6px_0_rgba(6,60,40,0.45)] backdrop-blur-xl"
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-semibold">Your drink is ready!</p>
-                <p className="text-sm text-emerald-100/90">Please collect your treat at the CHC counter.</p>
+                <ComicBadge>Plot resolved</ComicBadge>
+                <p className={clsx(bangers.className, "mt-1 text-2xl tracking-wide text-emerald-900")}>
+                  Your drink is ready!
+                </p>
+                <p className="mt-1 font-sans text-sm text-emerald-800/90">
+                  Zoom to the CHC counter and claim your victory sip.
+                </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowReadyToast(false)}
-                className="rounded-md border border-emerald-100/30 px-2 py-1 text-xs hover:bg-emerald-100/10"
+                className="shrink-0 rounded-lg border-2 border-emerald-900/30 bg-emerald-100/50 px-2 py-1 font-sans text-xs font-bold text-emerald-900 hover:bg-emerald-100"
               >
-                Dismiss
+                Got it
               </button>
             </div>
           </motion.div>
@@ -268,21 +356,30 @@ export function OrderFlow() {
         {step === "welcome" && (
           <motion.section key="welcome" {...fade} className="flex flex-1 flex-col items-center justify-center">
             <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Logo" className="mx-auto h-16 w-[200px]" />
-            <h1 className="mt-3 text-center text-4xl font-bold text-amber-50 sm:text-5xl capitalize">Choose your treat</h1>
+            <h1
+              className={clsx(
+                bangers.className,
+                "mt-3 text-center text-4xl tracking-wide text-amber-50 sm:text-6xl",
+              )}
+            >
+              Choose your treat!
+            </h1>
 
-            <div className="mt-8 w-full max-w-xl rounded-3xl border border-white/20 bg-white/10 p-5 text-left backdrop-blur-xl sm:p-6">
-              <label className="text-sm text-amber-50">
-                Name
+            <ComicPanel className="mt-8 w-full max-w-xl text-left">
+              <label className="mt-1 block">
+                <span className={clsx(bangers.className, "text-xl tracking-wide text-amber-50")}>Name</span>
                 <input
                   value={draftName}
                   onChange={(event) => setDraftName(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-amber-100/20 bg-black/20 px-4 py-3 text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
+                  className="mt-2 w-full rounded-2xl border-[3px] border-amber-950/30 bg-black/25 px-4 py-3 text-base text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
                   placeholder="Chocolate Legend"
                 />
               </label>
-              <p className="mt-4 max-w-xl text-amber-100/75">Click to see image cards</p>
+              <p className="mt-4 max-w-xl font-sans text-sm text-amber-100/80">
+                Click to see image cards
+              </p>
               <RippleButton
-                className="mt-4"
+                className="mt-5 border-[3px] border-amber-100/90 font-sans"
                 disabled={!draftName.trim()}
                 onClick={() => {
                   setNickname(draftName.trim());
@@ -291,20 +388,32 @@ export function OrderFlow() {
               >
                 Continue
               </RippleButton>
-            </div>
+            </ComicPanel>
           </motion.section>
         )}
 
         {step === "form" && (
-          <motion.section key="form" {...fade} className="flex flex-1 flex-col mt-16">
-            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-[200px]" />
-            <p className="mt-4 max-w-4xl text-amber-100/75 capitalize">
-              Hi {nickname}, choose your Cadbury Chocolate treat
-            </p>
+          <motion.section key="form" {...fade} className="relative flex flex-1 flex-col pt-10 sm:pt-14">
+            <div className="pointer-events-none absolute -right-4 top-24 hidden text-5xl opacity-[0.12] sm:block" aria-hidden>
+              ✦
+            </div>
+            <div className="pointer-events-none absolute left-0 top-40 text-3xl opacity-15" aria-hidden>
+              ✧
+            </div>
 
-            <div className="mt-8 grid gap-5 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl sm:p-6">
+            <img
+              src="/images/cadbury-amvca-logo.png"
+              alt="Cadbury Hot Chocolate Logo"
+              className="mx-auto block h-16 w-[200px]"
+            />
+            <ComicHeroGreeting nickname={nickname} />
+
+            <ComicPanel className="mt-10 grid gap-6">
               <div>
-                
+                <ComicBadge>Episode 1</ComicBadge>
+                <p className={clsx(bangers.className, "text-xl tracking-wide text-amber-50 sm:text-2xl")}>
+                  Pick your treat style
+                </p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {(
                     [
@@ -315,19 +424,22 @@ export function OrderFlow() {
                     const selected = treatChoice === choice;
                     const image = getTreatChoiceImage(choice);
                     return (
-                      <button
+                      <motion.button
                         key={choice}
                         type="button"
                         onClick={() => setTreatChoice(choice)}
-                        className={`rounded-2xl border p-3 text-left transition ${
+                        whileHover={reduceMotion ? undefined : { scale: 1.02, rotate: selected ? -0.5 : 0.5 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={clsx(
+                          "rounded-2xl border-[3px] p-3 text-left transition",
                           selected
-                            ? "border-amber-300 bg-amber-200/15 ring-2 ring-amber-300/50"
-                            : "border-amber-100/20 bg-black/20 hover:border-amber-200/40"
-                        }`}
+                            ? "border-amber-950/80 bg-amber-100/15 shadow-[5px_5px_0_rgba(0,0,0,0.4)] ring-0 sm:-rotate-1"
+                            : "border-dashed border-amber-100/35 bg-black/20 hover:border-amber-200/60 hover:bg-black/30",
+                        )}
                       >
                         <DrinkPhoto src={image.src} alt={image.alt} />
-                        <p className="mt-2 text-sm font-semibold text-amber-50">{label}</p>
-                      </button>
+                        <p className={clsx(bangers.className, "mt-2 text-lg tracking-wide text-amber-50")}>{label}</p>
+                      </motion.button>
                     );
                   })}
                 </div>
@@ -335,25 +447,31 @@ export function OrderFlow() {
 
               {treatChoice === "signature" && (
                 <div>
-                  <p className="text-sm text-amber-50 font-bold">Pick a signature gelato treat</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <ComicBadge>Plot twist</ComicBadge>
+                  <p className={clsx(bangers.className, "text-xl tracking-wide text-amber-50 sm:text-2xl")}>
+                    Pick a signature gelato treat
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {SIGNATURE_DRINKS.map((item) => {
                       const selected = selectedSignatureId === item.id;
                       const image = getSignatureImage(item.id);
                       return (
-                        <button
+                        <motion.button
                           key={item.id}
                           type="button"
                           onClick={() => setSelectedSignatureId(item.id)}
-                          className={`rounded-xl border p-2.5 text-center transition ${
+                          whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={clsx(
+                            "rounded-xl border-[3px] p-2.5 text-center transition",
                             selected
-                              ? "border-amber-300 bg-amber-200/15 ring-2 ring-amber-300/50"
-                              : "border-amber-100/20 bg-black/20 hover:border-amber-200/40"
-                          }`}
+                              ? "border-amber-950/80 bg-amber-100/15 shadow-[5px_5px_0_rgba(0,0,0,0.4)] sm:rotate-1"
+                              : "border-dashed border-amber-100/35 bg-black/20 hover:border-amber-200/60",
+                          )}
                         >
                           <DrinkPhoto src={image.src} alt={image.alt} />
-                          <p className="mt-2 text-sm font-semibold text-amber-50">{item.name}</p>
-                        </button>
+                          <p className="mt-2 font-sans text-sm font-semibold text-amber-50">{item.name}</p>
+                        </motion.button>
                       );
                     })}
                   </div>
@@ -362,66 +480,114 @@ export function OrderFlow() {
 
               {treatChoice === "custom-milkshake" && (
                 <div>
-                  <p className="text-sm text-amber-50 font-bold">Pick a signature milkshake treat below</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <ComicBadge>Milkshake mode</ComicBadge>
+                  <p className={clsx(bangers.className, "text-xl tracking-wide text-amber-50 sm:text-2xl")}>
+                    Pick a signature milkshake treat
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
                       const image = getCustomOptionImage(option);
                       return (
-                        <button
+                        <motion.button
                           key={option}
                           type="button"
                           onClick={() => setSelectedCustomOption(option)}
-                          className={`rounded-2xl border p-3 text-left transition ${
+                          whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={clsx(
+                            "rounded-2xl border-[3px] p-3 text-left transition",
                             selected
-                              ? "border-amber-300 bg-amber-200/15 ring-2 ring-amber-300/50"
-                              : "border-amber-100/20 bg-black/20 hover:border-amber-200/40"
-                          }`}
+                              ? "border-amber-950/80 bg-amber-100/15 shadow-[5px_5px_0_rgba(0,0,0,0.4)] sm:-rotate-1"
+                              : "border-dashed border-amber-100/35 bg-black/20 hover:border-amber-200/60",
+                          )}
                         >
                           <DrinkPhoto src={image.src} alt={image.alt} />
-                          <p className="mt-2 text-xs capitalize font-semibold text-amber-50">{option}</p>
-                        </button>
+                          <p className="mt-2 font-sans text-xs font-semibold capitalize text-amber-50">{option}</p>
+                        </motion.button>
                       );
                     })}
                   </div>
                 </div>
               )}
-            </div>
+            </ComicPanel>
 
             {builder && (
-              <div className="mt-6 grid gap-4 rounded-3xl border border-white/20 bg-white/10 p-5 sm:grid-cols-[1.4fr_1fr] sm:items-center">
+              <ComicPanel className="mt-6 grid gap-4 border-[3px] border-solid border-amber-200/40 sm:grid-cols-[1.4fr_1fr] sm:items-center">
                 <div>
-                  <p className="text-amber-100">Name: {draftName.trim() || "Not set yet"}</p>
-                  <p className="mt-2 text-amber-100">Order: {drinkTypeLabel}</p>
-                  <p className="mt-2 text-amber-100">Add-on Topping: {selectionLabel}</p>
-                 
+                  <ComicBadge>Your order</ComicBadge>
+                  <p className="mt-1 font-sans text-amber-100">
+                    <span className="font-black text-amber-200">Name:</span> {draftName.trim() || "Not set yet"}
+                  </p>
+                  <p className="mt-2 font-sans text-amber-100">
+                    <span className="font-black text-amber-200">Order:</span> {drinkTypeLabel}
+                  </p>
+                  <p className="mt-2 font-sans text-amber-100">
+                    <span className="font-black text-amber-200">Add-on:</span> {selectionLabel}
+                  </p>
                 </div>
-                <div className="sm:justify-self-end sm:w-full sm:max-w-52">
+                <div className="relative sm:justify-self-end sm:w-full sm:max-w-52">
+                  <div
+                    className="pointer-events-none absolute -right-1 -top-2 rotate-12 font-sans text-[0.65rem] font-black uppercase tracking-widest text-[#ffe566]"
+                    aria-hidden
+                  >
+                    Slurp!
+                  </div>
                   <DrinkPhoto src={getSummaryImage().src} alt={getSummaryImage().alt} />
                 </div>
-              </div>
+              </ComicPanel>
             )}
 
-            <div className="mt-6">
-              <RippleButton disabled={loadingOrder || !builder} onClick={placeOrder}>
-                {loadingOrder ? "Pouring your treat..." : "Submit Order"}
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <p className={clsx(bangers.className, "text-center text-xl tracking-wide text-amber-200 sm:text-2xl")}>
+                {loadingOrder ? "Pouring magic…" : "Ready? Bam — send it!"}
+              </p>
+              <RippleButton
+                className="min-w-[200px] border-[3px] border-amber-100/90 font-sans text-lg"
+                disabled={loadingOrder || !builder}
+                onClick={placeOrder}
+              >
+                {loadingOrder ? "Pouring your treat..." : "Submit order"}
               </RippleButton>
             </div>
           </motion.section>
         )}
 
         {step === "success" && placedOrder && (
-          <motion.section key="success" {...fade} className="flex flex-1 flex-col justify-center text-center">
-            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="mx-auto h-16 w-[200px] mb-10" />
+          <motion.section
+            key="success"
+            {...fade}
+            className="relative flex flex-1 flex-col justify-center pb-6 text-center sm:pb-10"
+          >
+            <div className="pointer-events-none absolute right-2 top-8 text-4xl opacity-15" aria-hidden>
+              ★
+            </div>
+            <img
+              src="/images/cadbury-amvca-logo.png"
+              alt="Cadbury Hot Chocolate Logo"
+              className="mx-auto mb-8 block h-16 w-[200px]"
+            />
+
             <motion.div
               initial={{ scale: 0.7, rotate: -4 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 220, damping: 12 }}
-              className="mx-auto w-fit rounded-full bg-emerald-300/20 px-6 py-3 text-emerald-100"
+              className="mx-auto w-full max-w-md px-1 text-center"
             >
-              Order #{placedOrder.id.slice(0, 6).toUpperCase()}
+              <ComicPanel className="flex flex-col items-center border-solid border-emerald-300/45 bg-emerald-500/10 text-center shadow-[6px_6px_0_rgba(6,40,30,0.5)]">
+                <ComicBadge>Transmission received</ComicBadge>
+                <p className={clsx(bangers.className, "mt-1 text-3xl tracking-wide text-emerald-50 sm:text-4xl")}>
+                  Order #{placedOrder.id.slice(0, 6).toUpperCase()}
+                </p>
+              </ComicPanel>
             </motion.div>
-            <h2 className="mt-5 text-xl sm:text-3xl font-bold text-amber-50">
+
+            <h2
+              className={clsx(
+                bangers.className,
+                "mx-auto mt-8 max-w-xl px-2 text-2xl leading-snug tracking-wide text-amber-50 sm:text-4xl",
+              )}
+            >
               Preparing {placedOrder.drinkName} for {nickname}{" "}
               <motion.span
                 aria-hidden
@@ -440,50 +606,120 @@ export function OrderFlow() {
                 ☕
               </motion.span>
             </h2>
-            
-            <p className="mt-2 text-sm text-amber-100/70">
-              Status: <span className="font-semibold">{getStatusLabel(placedOrder.status)}</span>
-            </p>
-            <div className="mt-8 flex justify-center">
+
+            <ComicPanel className="mx-auto mt-5 flex max-w-md flex-col items-center text-center">
+              <ComicBadge>Status bubble</ComicBadge>
+              <p className="mt-1 font-sans text-amber-100">
+                <span className="font-black text-amber-200">Now playing:</span>{" "}
+                <span className="font-semibold">{getStatusLabel(placedOrder.status)}</span>
+              </p>
+            </ComicPanel>
+
+            {placedOrder.status !== "Completed" && (
+              <ComicPanel
+                className="mx-auto mt-5 flex max-w-md flex-col items-center text-center sm:max-w-lg"
+                aria-live="polite"
+              >
+                <ComicBadge>Tick-tock</ComicBadge>
+                <p className={clsx(bangers.className, "mt-1 text-lg tracking-wide text-amber-50")}>Preparation countdown</p>
+                <p className={clsx(bangers.className, "mt-3 text-5xl tabular-nums tracking-tight text-amber-50")}>
+                  <PreparationCountdown order={placedOrder} />
+                </p>
+              </ComicPanel>
+            )}
+
+            {placedOrder.status === "Completed" && (
+              <p className={clsx(bangers.className, "mx-auto mt-4 max-w-md text-xl tracking-wide text-emerald-200")}>
+                Boom — ready to collect!
+              </p>
+            )}
+
+            <div className="mt-8 flex flex-col items-center gap-2">
               <RippleButton
-                className="bg-white/20 text-amber-50"
+                className="border-[3px] border-amber-100/90 font-sans"
                 disabled={placedOrder.status !== "Completed"}
                 onClick={() => setHasCollectedDrink(true)}
               >
-                I have taken my drink
+                I&apos;ve got my cup 
               </RippleButton>
-            </div>
-            <div className="mt-3 flex justify-center">
               <RippleButton
+                className="border-[3px] border-amber-100/90 font-sans"
                 disabled={placedOrder.status !== "Completed" || !hasCollectedDrink}
                 onClick={() => setStep("feedback")}
               >
-                Leave Feedback
+                Drop the review
               </RippleButton>
             </div>
           </motion.section>
         )}
 
         {step === "feedback" && (
-          <motion.section key="feedback" {...fade} className="flex flex-1 flex-col">
-            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="mx-auto h-16 w-[200px] mb-10" />
-
-            <h2 className="text-3xl font-bold text-amber-50">Rate your CHC experience</h2>
-            <div className="mt-6 rounded-3xl border border-white/20 bg-white/10 p-5">
-              <Range title="Overall rating" value={rating} onChange={setRating} />
-              <Range title="Taste" value={taste} onChange={setTaste} />
-              <Range title="Presentation" value={presentation} onChange={setPresentation} />
-              <Range title="Experience" value={experience} onChange={setExperience} />
-              <textarea
-                value={comment}
-                onChange={(event) => setComment(event.target.value)}
-                className="mt-4 min-h-24 w-full rounded-2xl border border-amber-100/20 bg-black/20 px-4 py-3 text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
-                placeholder="Any extra sweetness to share?"
-              />
+          <motion.section key="feedback" {...fade} className="relative flex flex-1 flex-col pt-6 sm:pt-10">
+            <div className="pointer-events-none absolute left-3 top-24 text-3xl opacity-15" aria-hidden>
+              ✦
             </div>
-            <RippleButton className="mt-6 w-full sm:w-fit" disabled={sendingFeedback} onClick={submitFeedback}>
-              {sendingFeedback ? "Submitting..." : "Submit Feedback"}
-            </RippleButton>
+            <img
+              src="/images/cadbury-amvca-logo.png"
+              alt="Cadbury Hot Chocolate Logo"
+              className="mx-auto mb-8 block h-16 w-[200px]"
+            />
+
+            <ComicHeroGreeting nickname={nickname} variant="feedback" />
+
+            <ComicPanel className="mt-10">
+              <ComicBadge>Final panel</ComicBadge>
+              <h2 className={clsx(bangers.className, "mt-1 text-3xl tracking-wide text-amber-50 sm:text-4xl")}>
+                Rate the adventure
+              </h2>
+              <p className="mt-2 font-sans text-sm text-amber-100/80">
+                Sliders from 1 (meh) to 5 (chef&apos;s kiss). Spill the cocoa beans below.
+              </p>
+              <Range
+                title="Overall rating"
+                value={rating}
+                onChange={setRating}
+                titleClassName={clsx(bangers.className, "text-lg tracking-wide")}
+              />
+              <Range
+                title="Taste"
+                value={taste}
+                onChange={setTaste}
+                titleClassName={clsx(bangers.className, "text-lg tracking-wide")}
+              />
+              <Range
+                title="Presentation"
+                value={presentation}
+                onChange={setPresentation}
+                titleClassName={clsx(bangers.className, "text-lg tracking-wide")}
+              />
+              <Range
+                title="Experience"
+                value={experience}
+                onChange={setExperience}
+                titleClassName={clsx(bangers.className, "text-lg tracking-wide")}
+              />
+              <label className="mt-4 block text-left">
+                <span className={clsx(bangers.className, "text-lg tracking-wide text-amber-50")}>Bonus speech bubble</span>
+                <textarea
+                  value={comment}
+                  onChange={(event) => setComment(event.target.value)}
+                  className="mt-2 min-h-24 w-full rounded-2xl border-[3px] border-amber-950/30 bg-black/25 px-4 py-3 font-sans text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
+                  placeholder="Any extra sweetness to share?"
+                />
+              </label>
+            </ComicPanel>
+            <div className="mt-6 flex flex-col items-center gap-2">
+              <p className={clsx(bangers.className, "text-center text-lg tracking-wide text-amber-200")}>
+                {sendingFeedback ? "Beaming it up…" : "Launch when you&apos;re ready!"}
+              </p>
+              <RippleButton
+                className="w-full border-[3px] border-amber-100/90 font-sans sm:w-fit"
+                disabled={sendingFeedback}
+                onClick={submitFeedback}
+              >
+                {sendingFeedback ? "Submitting..." : "Send feedback — zoom!"}
+              </RippleButton>
+            </div>
           </motion.section>
         )}
       </AnimatePresence>
@@ -495,14 +731,16 @@ function Range({
   title,
   value,
   onChange,
+  titleClassName,
 }: {
   title: string;
   value: number;
   onChange: (value: number) => void;
+  titleClassName?: string;
 }) {
   return (
     <label className="mt-3 flex items-center justify-between gap-4 text-sm text-amber-50">
-      <span>{title}</span>
+      <span className={titleClassName}>{title}</span>
       <input
         type="number"
         min={1}
@@ -514,7 +752,7 @@ function Range({
           if (Number.isNaN(next)) return;
           onChange(Math.max(1, Math.min(5, next)));
         }}
-        className="w-20 rounded-xl border border-amber-100/20 bg-black/20 px-3 py-2 text-center text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
+        className="w-20 rounded-xl border-[3px] border-amber-950/25 bg-black/25 px-3 py-2 text-center font-sans font-semibold text-amber-50 outline-none focus:ring-2 focus:ring-amber-300"
       />
     </label>
   );

@@ -3,15 +3,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { PreparationCountdown } from "@/components/preparation-countdown";
 import { RippleButton } from "@/components/ripple-button";
 import type { Order, OrderStatus } from "@/lib/types";
 
-const statuses: Array<OrderStatus | "all"> = ["all", "Pending", "Preparing", "Completed"];
+const statuses: Array<OrderStatus | "all"> = [
+  "all",
+  "Pending",
+  "Preparing",
+  "Completed",
+];
 
 const PAGE_SIZE = 5;
-
-/** Standard prep time shown for every order on the admin screen. */
-const PREPARATION_TIME_LABEL = "2 mins";
 
 function getStatusLabel(status: OrderStatus | "all") {
   if (status === "all") return "All";
@@ -51,14 +54,26 @@ export default function AdminPage() {
       enter: (dir: number) =>
         reduceMotion
           ? { opacity: 0 }
-          : { opacity: 0, x: dir * 56, y: 10, scale: 0.97, filter: "blur(4px)" },
+          : {
+              opacity: 0,
+              x: dir * 56,
+              y: 10,
+              scale: 0.97,
+              filter: "blur(4px)",
+            },
       center: reduceMotion
         ? { opacity: 1 }
         : { opacity: 1, x: 0, y: 0, scale: 1, filter: "blur(0px)" },
       leave: (dir: number) =>
         reduceMotion
           ? { opacity: 0 }
-          : { opacity: 0, x: dir * -40, y: -6, scale: 0.98, filter: "blur(3px)" },
+          : {
+              opacity: 0,
+              x: dir * -40,
+              y: -6,
+              scale: 0.98,
+              filter: "blur(3px)",
+            },
     }),
     [reduceMotion],
   );
@@ -110,7 +125,10 @@ export default function AdminPage() {
     };
   }, [orders]);
 
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(orders.length / PAGE_SIZE)), [orders.length]);
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(orders.length / PAGE_SIZE)),
+    [orders.length],
+  );
   const currentPage = Math.min(Math.max(1, page), totalPages);
 
   const pagedOrders = useMemo(
@@ -118,8 +136,10 @@ export default function AdminPage() {
     [orders, currentPage],
   );
 
-  const rangeStart = orders.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const rangeEnd = orders.length === 0 ? 0 : Math.min(currentPage * PAGE_SIZE, orders.length);
+  const rangeStart =
+    orders.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+  const rangeEnd =
+    orders.length === 0 ? 0 : Math.min(currentPage * PAGE_SIZE, orders.length);
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden text-amber-50">
@@ -143,7 +163,7 @@ export default function AdminPage() {
         src="/images/chc-image2.png"
         alt="Cadbury sachet pack"
         aria-hidden
-        className="pointer-events-none absolute bottom-6 right-2 z-0 w-28 opacity-45 sm:w-32 md:bottom-auto md:right-6 md:top-1/2 md:w-80 md:-translate-y-1/2 md:opacity-85"
+        className="pointer-events-none absolute top-10 right-2 z-0 w-28 opacity-45 sm:w-32 md:right-6 md:top-1/6 md:w-48 md:-translate-y-1/2 md:opacity-85"
         animate={
           reduceMotion
             ? { opacity: 0.85 }
@@ -157,9 +177,17 @@ export default function AdminPage() {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-6 sm:px-8">
-      <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Hot Chocolate Logo" className="h-16 w-[200px] mb-10 mt-10" />
-        <h1 className="text-3xl font-bold">Cadbury Chocolate Treat Order Screen</h1>
-        <p className="mt-2 text-amber-100/75">Realtime order queue for live experiential events</p>
+        <img
+          src="/images/cadbury-amvca-logo.png"
+          alt="Cadbury Hot Chocolate Logo"
+          className="h-16 w-[200px] mb-10 mt-10"
+        />
+        <h1 className="text-3xl font-bold">
+          Cadbury Chocolate Treat Order Screen
+        </h1>
+        <p className="mt-2 text-amber-100/75">
+          Realtime order queue for live experiential events
+        </p>
         <div className="mt-4 grid grid-cols-3 gap-3">
           <StatCard label="Pending" value={groupedCount.pending} />
           <StatCard label="Preparing" value={groupedCount.preparing} />
@@ -174,7 +202,9 @@ export default function AdminPage() {
                 setPage(1);
                 setPageSlide(1);
               }}
-              className={status === item ? "" : "bg-white/20 text-amber-50 shadow-none"}
+              className={
+                status === item ? "" : "bg-white/20 text-amber-50 shadow-none"
+              }
             >
               {getStatusLabel(item)}
             </RippleButton>
@@ -205,21 +235,37 @@ export default function AdminPage() {
               >
                 {pagedOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="p-8 text-center text-amber-100/70">
+                    <td
+                      colSpan={5}
+                      className="p-8 text-center text-amber-100/70"
+                    >
                       No orders in this view.
                     </td>
                   </tr>
                 ) : (
                   pagedOrders.map((order) => (
                     <tr key={order.id} className="border-t border-white/10">
-                      <td className="p-3 align-top font-medium">{order.nickname}</td>
-                      <td className="p-3 align-top text-amber-100/90">{orderDescription(order)}</td>
-                      <td className="p-3 align-top tabular-nums text-amber-100/85">{PREPARATION_TIME_LABEL}</td>
-                      <td className="p-3 align-top">{getStatusLabel(order.status)}</td>
+                      <td className="p-3 align-top font-medium">
+                        {order.nickname}
+                      </td>
+                      <td className="p-3 align-top text-amber-100/90">
+                        {orderDescription(order)}
+                      </td>
+                      <td className="p-3 align-top tabular-nums text-amber-100/85">
+                        <PreparationCountdown order={order} />
+                      </td>
+                      <td className="p-3 align-top">
+                        {getStatusLabel(order.status)}
+                      </td>
                       <td className="p-3 align-top">
                         <select
                           value={order.status}
-                          onChange={(event) => updateStatus(order.id, event.target.value as OrderStatus)}
+                          onChange={(event) =>
+                            updateStatus(
+                              order.id,
+                              event.target.value as OrderStatus,
+                            )
+                          }
                           className="rounded-md bg-black/30 px-2 py-1"
                         >
                           <option value="Pending">Pending</option>
@@ -287,7 +333,9 @@ export default function AdminPage() {
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-2xl border border-white/15 bg-white/10 p-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-amber-100/70">{label}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-amber-100/70">
+        {label}
+      </p>
       <p className="mt-1 text-3xl font-bold">{value}</p>
     </div>
   );
