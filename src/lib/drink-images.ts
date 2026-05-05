@@ -32,15 +32,15 @@ export const DRINK_IMAGES = {
     alt: "Chocolate milkshake topped with cream",
   },
   ingredient: {
-    src: "/images/chc-milkshake-img.jpeg",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   expresso: {
-    src: "/images/chc-milkshake-img.jpeg",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Espresso Milkshake",
   },
   milkshake: {
-    src: "/images/chc-milkshake-img.jpeg",
+    src: "/images/chc-milkshare-img.jpeg",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   alcoholInfusion: {
