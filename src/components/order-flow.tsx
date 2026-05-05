@@ -355,7 +355,7 @@ export function OrderFlow() {
       <AnimatePresence mode="wait">
         {step === "welcome" && (
           <motion.section key="welcome" {...fade} className="flex flex-1 flex-col items-center justify-center">
-            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Logo" className="mx-auto h-16 w-[200px]" />
+            <img src="/images/cadbury-amvca-logo.png" alt="Cadbury Logo" className="mx-auto h-30 w-60" />
             <h1
               className={clsx(
                 bangers.className,
@@ -404,7 +404,7 @@ export function OrderFlow() {
             <img
               src="/images/cadbury-amvca-logo.png"
               alt="Cadbury Hot Chocolate Logo"
-              className="mx-auto block h-16 w-[200px]"
+              className="mx-auto block h-30 w-60 "
             />
             <ComicHeroGreeting nickname={nickname} />
 
@@ -565,7 +565,7 @@ export function OrderFlow() {
             <img
               src="/images/cadbury-amvca-logo.png"
               alt="Cadbury Hot Chocolate Logo"
-              className="mx-auto mb-8 block h-16 w-[200px]"
+              className="mx-auto mb-8 block  h-30 w-60"
             />
 
             <motion.div
@@ -661,7 +661,7 @@ export function OrderFlow() {
             <img
               src="/images/cadbury-amvca-logo.png"
               alt="Cadbury Hot Chocolate Logo"
-              className="mx-auto mb-8 block h-16 w-[200px]"
+              className="mx-auto mb-8 block h-30 w-60"
             />
 
             <ComicHeroGreeting nickname={nickname} variant="feedback" />
