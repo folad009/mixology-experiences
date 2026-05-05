@@ -126,9 +126,9 @@ function getSignatureImage(drinkId: string) {
 
 function getCustomOptionImage(option: string) {
   switch (option) {
-    case "Cadbury Chocolate + Caramel Milkshake":
+    case "Cadbury Chocolate Caramel Milkshake":
       return DRINK_IMAGES.ingredient;
-    case "Cadbury Chocolate + Expresso Milkshake":
+    case "Cadbury Chocolate Expresso Milkshake":
       return DRINK_IMAGES.expresso;
     case "Cadbury Chocolate Milkshake":
       return DRINK_IMAGES.milkshake;
