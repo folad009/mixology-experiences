@@ -25,8 +25,8 @@ export const SIGNATURE_DRINKS: DrinkOption[] = [
 export const CUSTOM_OPTIONS = {
   IceCream: ["Choco Chips", "Brownie Bits", "Caramel Drip", "Hazelnut Dust", "Whipped Cream"],
   Milkshake: [
-    "Cadbury Chocolate + Caramel Milkshake",
-    "Cadbury Chocolate + Expresso Milkshake",
+    "Cadbury Chocolate Caramel Milkshake",
+    "Cadbury Chocolate Expresso Milkshake",
     "Cadbury Chocolate Milkshake",
   ],
 } as const;
