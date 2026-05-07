@@ -25,7 +25,11 @@ function getStatusLabel(status: OrderStatus | "all") {
 /** One line for kitchen: treat + variant when applicable. */
 function orderDescription(order: Order): string {
   if (order.drinkType === "Custom" && order.selections.length >= 2) {
-    return `${order.drinkName} — ${order.selections[1]}`;
+    const customSelection = order.selections[1];
+    const alcoholAddon = order.selections[2];
+    return alcoholAddon
+      ? `${order.drinkName} — ${customSelection} (${alcoholAddon})`
+      : `${order.drinkName} — ${customSelection}`;
   }
   if (order.selections.length > 0) {
     return `${order.drinkName} `;
@@ -180,7 +184,7 @@ export default function AdminPage() {
         <img
           src="/images/cadbury-amvca-logo.png"
           alt="Cadbury Hot Chocolate Logo"
-          className="h-16 w-[200px] mb-10 mt-10"
+          className="h-30 w-60 mb-10 mt-10"
         />
         <h1 className="text-3xl font-bold">
           Cadbury Chocolate Treat Order Screen

@@ -18,6 +18,7 @@ import type { DrinkCategory, Order } from "@/lib/types";
 type Step = "welcome" | "form" | "success" | "feedback";
 type TreatChoice = "signature" | "custom-milkshake";
 type CustomOption = (typeof CUSTOM_OPTIONS.Milkshake)[number];
+type AlcoholAddonChoice = "Yes, I want alchocol" | "No, I don't want alchocol";
 
 const bangers = Bangers({
   weight: "400",
@@ -151,6 +152,7 @@ export function OrderFlow() {
   const [treatChoice, setTreatChoice] = useState<TreatChoice | null>(null);
   const [selectedSignatureId, setSelectedSignatureId] = useState(SIGNATURE_DRINKS[0]?.id ?? "");
   const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.Milkshake[0]);
+  const [selectedAlcoholAddon, setSelectedAlcoholAddon] = useState<AlcoholAddonChoice>("No, I don't want alchocol");
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [rating, setRating] = useState(5);
   const [taste, setTaste] = useState(5);
@@ -179,7 +181,11 @@ export function OrderFlow() {
 
   const selectionLabel = useMemo(() => {
     if (!builder) return "";
-    if (builder.drinkType === "Custom") return builder.selections[1] ?? builder.drinkName;
+    if (builder.drinkType === "Custom") {
+      const milkshakeSelection = builder.selections[1] ?? builder.drinkName;
+      const alcoholAddon = builder.selections[2] ?? "No, I don't want alchocol";
+      return `${milkshakeSelection} (${alcoholAddon})`;
+    }
     return builder.drinkName;
   }, [builder]);
 
@@ -212,9 +218,9 @@ export function OrderFlow() {
       drinkType: "Custom",
       category: customCategory,
       drinkName: TREAT_NAMES.signatureMilkshake,
-      selections: [base, selectedCustomOption],
+      selections: [base, selectedCustomOption, selectedAlcoholAddon],
     });
-  }, [customCategory, selectedCustomOption, selectedSignatureId, setBuilder, treatChoice]);
+  }, [customCategory, selectedAlcoholAddon, selectedCustomOption, selectedSignatureId, setBuilder, treatChoice]);
 
   async function placeOrder() {
     if (!builder || !nickname) return;
@@ -266,6 +272,7 @@ export function OrderFlow() {
     setTreatChoice(null);
     setSelectedSignatureId(SIGNATURE_DRINKS[0]?.id ?? "");
     setSelectedCustomOption(CUSTOM_OPTIONS.Milkshake[0]);
+    setSelectedAlcoholAddon("No, I don't want alchocol");
     setHasCollectedDrink(false);
   }
 
@@ -507,6 +514,34 @@ export function OrderFlow() {
                         </motion.button>
                       );
                     })}
+                  </div>
+                  <div className="mt-6">
+                    <ComicBadge>Addon option</ComicBadge>
+                    <p className={clsx(bangers.className, "text-lg tracking-wide text-amber-50 sm:text-xl")}>
+                      Do you want alchocol infusion?
+                    </p>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      {(["Yes, I want alchocol", "No, I don't want alchocol"] as const).map((option) => {
+                        const selected = selectedAlcoholAddon === option;
+                        return (
+                          <motion.button
+                            key={option}
+                            type="button"
+                            onClick={() => setSelectedAlcoholAddon(option)}
+                            whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={clsx(
+                              "rounded-2xl border-[3px] p-3 text-left transition",
+                              selected
+                                ? "border-amber-950/80 bg-amber-100/15 shadow-[5px_5px_0_rgba(0,0,0,0.4)] sm:rotate-1"
+                                : "border-dashed border-amber-100/35 bg-black/20 hover:border-amber-200/60",
+                            )}
+                          >
+                            <p className="mt-2 font-sans text-sm font-semibold text-amber-50">{option}</p>
+                          </motion.button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
