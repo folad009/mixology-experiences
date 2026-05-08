@@ -154,6 +154,7 @@ export function OrderFlow() {
   const [selectedCustomOption, setSelectedCustomOption] = useState<CustomOption>(CUSTOM_OPTIONS.Milkshake[0]);
   const [selectedAlcoholAddon, setSelectedAlcoholAddon] = useState<AlcoholAddonChoice>("No, I don't want alchocol");
   const [loadingOrder, setLoadingOrder] = useState(false);
+  const [orderError, setOrderError] = useState("");
   const [rating, setRating] = useState(5);
   const [taste, setTaste] = useState(5);
   const [presentation, setPresentation] = useState(5);
@@ -161,6 +162,8 @@ export function OrderFlow() {
   const [comment, setComment] = useState("");
   const [sendingFeedback, setSendingFeedback] = useState(false);
   const [showReadyToast, setShowReadyToast] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorToastMessage, setErrorToastMessage] = useState("");
   const [hasCollectedDrink, setHasCollectedDrink] = useState(false);
   const readyToastShownRef = useRef(false);
   const reduceMotion = useReducedMotion();
@@ -225,26 +228,27 @@ export function OrderFlow() {
   async function placeOrder() {
     if (!builder || !nickname) return;
     setLoadingOrder(true);
+    setOrderError("");
+    setShowErrorToast(false);
+    setErrorToastMessage("");
     try {
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nickname, ...builder }),
       });
-
-      const raw = await response.text();
-      if (!response.ok) {
-        throw new Error(raw || "Order request failed");
+      const data = (await response.json()) as { order?: Order; error?: string };
+      if (!response.ok || !data.order) {
+        throw new Error(data.error ?? "Order request failed");
       }
-      if (!raw) {
-        throw new Error("Empty response from order API");
-      }
-
-      const data = JSON.parse(raw) as { order: Order };
       setPlacedOrder(data.order);
       setStep("success");
     } catch (error) {
       console.error("Failed to place order", error);
+      const message = error instanceof Error ? error.message : "Unable to place order right now.";
+      setOrderError(message);
+      setErrorToastMessage(message);
+      setShowErrorToast(true);
     } finally {
       setLoadingOrder(false);
     }
@@ -331,6 +335,33 @@ export function OrderFlow() {
         }
       />
       <AnimatePresence>
+        {showErrorToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.96 }}
+            className="fixed bottom-6 left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 rounded-[1.25rem] border-[3px] border-rose-950/45 bg-rose-100/95 px-4 py-3 text-rose-950 shadow-[6px_6px_0_rgba(80,10,10,0.35)] backdrop-blur-xl"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <ComicBadge>Heads up</ComicBadge>
+                <p className={clsx(bangers.className, "mt-1 text-2xl tracking-wide text-rose-900")}>
+                  Unable to submit order
+                </p>
+                <p className="mt-1 font-sans text-sm text-rose-900/90">
+                  {errorToastMessage}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowErrorToast(false)}
+                className="shrink-0 rounded-lg border-2 border-rose-900/30 bg-rose-200/70 px-2 py-1 font-sans text-xs font-bold text-rose-900 hover:bg-rose-200"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        )}
         {showReadyToast && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
@@ -491,7 +522,7 @@ export function OrderFlow() {
                   <p className={clsx(bangers.className, "text-xl tracking-wide text-amber-50 sm:text-2xl")}>
                     Pick a signature milkshake treat
                   </p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     {currentCustomOptions.map((option) => {
                       const selected = selectedCustomOption === option;
                       const image = getCustomOptionImage(option);
@@ -561,7 +592,7 @@ export function OrderFlow() {
                     <span className="font-black text-amber-200">Add-on:</span> {selectionLabel}
                   </p>
                 </div>
-                <div className="relative sm:justify-self-end sm:w-full sm:max-w-52">
+                <div className="relative sm:justify-self-end sm:w-full sm:max-w-56">
                   <div
                     className="pointer-events-none absolute -right-1 -top-2 rotate-12 font-sans text-[0.65rem] font-black uppercase tracking-widest text-[#ffe566]"
                     aria-hidden
@@ -584,6 +615,11 @@ export function OrderFlow() {
               >
                 {loadingOrder ? "Pouring your treat..." : "Submit order"}
               </RippleButton>
+              {orderError ? (
+                <p className="max-w-md text-center font-sans text-sm text-rose-200">
+                  {orderError}
+                </p>
+              ) : null}
             </div>
           </motion.section>
         )}
@@ -656,10 +692,17 @@ export function OrderFlow() {
                 aria-live="polite"
               >
                 <ComicBadge>Tick-tock</ComicBadge>
-                <p className={clsx(bangers.className, "mt-1 text-lg tracking-wide text-amber-50")}>Preparation countdown</p>
+                <p className={clsx(bangers.className, "mt-1 text-lg tracking-wide text-amber-50")}>
+                  Estimated preparation time
+                </p>
                 <p className={clsx(bangers.className, "mt-3 text-5xl tabular-nums tracking-tight text-amber-50")}>
                   <PreparationCountdown order={placedOrder} />
                 </p>
+                {placedOrder.queuePosition ? (
+                  <p className="mt-2 font-sans text-sm text-amber-100/80">
+                    You are currently queue #{placedOrder.queuePosition}
+                  </p>
+                ) : null}
               </ComicPanel>
             )}
 

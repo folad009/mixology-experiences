@@ -20,6 +20,8 @@ export type Order = {
   selections: string[];
   status: OrderStatus;
   createdAt: string;
+  preparationSeconds: number;
+  queuePosition?: number;
 };
 
 export type Feedback = {

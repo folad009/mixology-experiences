@@ -4,54 +4,39 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import type { Order } from "@/lib/types";
 
-/** Prep window from order creation (2-minute SLA). */
-const PREPARATION_MS = 2 * 60 * 1000;
-
-function formatPrepRemaining(ms: number): string {
-  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
 export type PreparationCountdownProps = {
   order: Order;
   className?: string;
 };
 
 export function PreparationCountdown({ order, className }: PreparationCountdownProps) {
-  const [now, setNow] = useState(0);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNow(Date.now());
-  }, []);
-
-  useEffect(() => {
-    if (order.status === "Completed") return;
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, [order.status, order.id]);
-
-  if (order.status === "Completed") {
+  if (!Number.isFinite(order.preparationSeconds)) {
     return <span className={clsx("text-amber-100/50", className)}>—</span>;
   }
 
-  const start = new Date(order.createdAt).getTime();
-  if (Number.isNaN(start)) {
-    return <span className={clsx("text-amber-100/50", className)}>—</span>;
-  }
+  const [remainingSeconds, setRemainingSeconds] = useState(() => Math.max(0, Math.trunc(order.preparationSeconds)));
 
-  const remaining = start + PREPARATION_MS - now;
-  const overdue = remaining <= 0;
+  useEffect(() => {
+    setRemainingSeconds(Math.max(0, Math.trunc(order.preparationSeconds)));
+  }, [order.id, order.preparationSeconds]);
+
+  useEffect(() => {
+    if (remainingSeconds <= 0) return;
+    const timer = window.setInterval(() => {
+      setRemainingSeconds((previous) => Math.max(0, previous - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [remainingSeconds]);
+
+  const minutes = Math.floor(remainingSeconds / 60);
+  const seconds = remainingSeconds % 60;
+  const minuteLabel = `${minutes} ${minutes === 1 ? "min" : "mins"}`;
+  const secondLabel = `${seconds} ${seconds === 1 ? "sec" : "secs"}`;
+  const timeLabel = `${minuteLabel} ${secondLabel}`;
 
   return (
-    <span
-      className={clsx(overdue && "font-medium text-rose-300", className)}
-      aria-label={overdue ? "Preparation time exceeded" : `${formatPrepRemaining(remaining)} remaining`}
-      suppressHydrationWarning
-    >
-      {formatPrepRemaining(remaining)}
+    <span className={clsx(className)} aria-label={`Estimated preparation time: ${timeLabel}`}>
+      {timeLabel}
     </span>
   );
 }

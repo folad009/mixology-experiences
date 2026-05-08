@@ -6,11 +6,14 @@ CREATE TABLE IF NOT EXISTS orders (
   drink_name TEXT NOT NULL,
   selections JSONB NOT NULL DEFAULT '[]'::jsonb,
   status TEXT NOT NULL CHECK (status IN ('Pending', 'Preparing', 'Completed')),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  preparation_seconds INT NOT NULL DEFAULT 120 CHECK (preparation_seconds >= 120 AND preparation_seconds <= 240),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  archived_at TIMESTAMPTZ
 );
 
 CREATE INDEX IF NOT EXISTS orders_status_idx ON orders(status);
 CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders(created_at DESC);
+CREATE INDEX IF NOT EXISTS orders_archived_at_idx ON orders(archived_at);
 
 CREATE TABLE IF NOT EXISTS feedback (
   id UUID PRIMARY KEY,

@@ -41,6 +41,9 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [status, setStatus] = useState<OrderStatus | "all">("all");
   const [page, setPage] = useState(1);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [bulkError, setBulkError] = useState("");
   /** 1 = forward (next), -1 = back — drives slide direction on page change. */
   const [pageSlide, setPageSlide] = useState(1);
   const reduceMotion = useReducedMotion();
@@ -97,6 +100,12 @@ export default function AdminPage() {
       const data = (await response.json()) as { orders: Order[] };
       if (active) {
         setOrders(data.orders);
+        setSelectedOrderIds((previous) => {
+          const pendingIds = new Set(
+            data.orders.filter((order) => order.status === "Pending").map((order) => order.id),
+          );
+          return previous.filter((id) => pendingIds.has(id));
+        });
       }
     };
     void load();
@@ -121,6 +130,33 @@ export default function AdminPage() {
     void fetchOrders(status);
   }
 
+  async function markSelectedPendingOrdersReady() {
+    if (selectedOrderIds.length < 5) {
+      setBulkError("Select at least 5 pending orders.");
+      return;
+    }
+
+    setBulkUpdating(true);
+    setBulkError("");
+    try {
+      const response = await fetch("/api/orders/bulk-ready", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderIds: selectedOrderIds }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "Bulk update failed");
+      }
+      setSelectedOrderIds([]);
+      await fetchOrders(status);
+    } catch (error) {
+      setBulkError(error instanceof Error ? error.message : "Bulk update failed");
+    } finally {
+      setBulkUpdating(false);
+    }
+  }
+
   const groupedCount = useMemo(() => {
     return {
       pending: orders.filter((order) => order.status === "Pending").length,
@@ -139,6 +175,13 @@ export default function AdminPage() {
     () => orders.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
     [orders, currentPage],
   );
+  const pendingOrderIdsOnPage = useMemo(
+    () => pagedOrders.filter((order) => order.status === "Pending").map((order) => order.id),
+    [pagedOrders],
+  );
+  const selectableCountOnPage = pendingOrderIdsOnPage.length;
+  const selectedCountOnPage = pendingOrderIdsOnPage.filter((id) => selectedOrderIds.includes(id)).length;
+  const allPendingOnPageSelected = selectableCountOnPage > 0 && selectedCountOnPage === selectableCountOnPage;
 
   const rangeStart =
     orders.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
@@ -150,7 +193,7 @@ export default function AdminPage() {
       <div
         className="pointer-events-none absolute inset-0 bg-no-repeat"
         style={{
-          backgroundImage: "url('/images/chc-background-neww.png')",
+          backgroundImage: "url('/images/chc-admin-bckground.png')",
           backgroundPosition: "right center",
           backgroundSize: "100% 100%",
           backgroundRepeat: "no-repeat",
@@ -192,6 +235,14 @@ export default function AdminPage() {
         <p className="mt-2 text-amber-100/75">
           Realtime order queue for live experiential events
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <a
+            href="/display"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-2xl border-[3px] border-amber-100/90 bg-white/20 px-4 py-2 font-sans text-xs font-bold uppercase tracking-[0.08em] text-amber-50 transition hover:bg-white/30"
+          >
+            Open big screen
+          </a>
+        </div>
         <div className="mt-4 grid grid-cols-3 gap-3">
           <StatCard label="Pending" value={groupedCount.pending} />
           <StatCard label="Preparing" value={groupedCount.preparing} />
@@ -214,11 +265,47 @@ export default function AdminPage() {
             </RippleButton>
           ))}
         </div>
+        <div className="mt-4 rounded-2xl border border-white/20 bg-white/10 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-amber-100/85">
+              Bulk ready action: select pending orders and mark them ready in one click.
+            </p>
+            <RippleButton
+              disabled={bulkUpdating || selectedOrderIds.length < 5}
+              onClick={markSelectedPendingOrdersReady}
+              className={selectedOrderIds.length < 5 ? "bg-white/20 text-amber-50 shadow-none" : ""}
+            >
+              {bulkUpdating ? "Updating..." : `Mark selected ready (${selectedOrderIds.length})`}
+            </RippleButton>
+          </div>
+          <p className="mt-2 text-xs text-amber-100/75">
+            Minimum 5 pending orders required.
+          </p>
+          {bulkError ? <p className="mt-2 text-sm text-rose-200">{bulkError}</p> : null}
+        </div>
 
         <section className="mt-6 overflow-x-auto rounded-2xl border border-white/20">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead className="bg-white/10">
               <tr>
+                <th className="p-3 font-semibold">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all pending orders on page"
+                    checked={allPendingOnPageSelected}
+                    disabled={selectableCountOnPage === 0}
+                    onChange={(event) => {
+                      setBulkError("");
+                      const checked = event.target.checked;
+                      setSelectedOrderIds((previous) => {
+                        if (checked) {
+                          return Array.from(new Set([...previous, ...pendingOrderIdsOnPage]));
+                        }
+                        return previous.filter((id) => !pendingOrderIdsOnPage.includes(id));
+                      });
+                    }}
+                  />
+                </th>
                 <th className="p-3 font-semibold">Name</th>
                 <th className="p-3 font-semibold">Order</th>
                 <th className="p-3 font-semibold">Time for preparation</th>
@@ -240,7 +327,7 @@ export default function AdminPage() {
                 {pagedOrders.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="p-8 text-center text-amber-100/70"
                     >
                       No orders in this view.
@@ -249,6 +336,22 @@ export default function AdminPage() {
                 ) : (
                   pagedOrders.map((order) => (
                     <tr key={order.id} className="border-t border-white/10">
+                      <td className="p-3 align-top">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select order ${order.id}`}
+                          disabled={order.status !== "Pending"}
+                          checked={selectedOrderIds.includes(order.id)}
+                          onChange={(event) => {
+                            setBulkError("");
+                            const checked = event.target.checked;
+                            setSelectedOrderIds((previous) => {
+                              if (checked) return Array.from(new Set([...previous, order.id]));
+                              return previous.filter((id) => id !== order.id);
+                            });
+                          }}
+                        />
+                      </td>
                       <td className="p-3 align-top font-medium">
                         {order.nickname}
                       </td>
@@ -257,6 +360,11 @@ export default function AdminPage() {
                       </td>
                       <td className="p-3 align-top tabular-nums text-amber-100/85">
                         <PreparationCountdown order={order} />
+                        {order.queuePosition ? (
+                          <p className="mt-1 text-xs tabular-nums text-amber-100/70">
+                            Queue #{order.queuePosition}
+                          </p>
+                        ) : null}
                       </td>
                       <td className="p-3 align-top">
                         {getStatusLabel(order.status)}

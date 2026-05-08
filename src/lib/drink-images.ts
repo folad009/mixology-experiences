@@ -8,11 +8,11 @@ export const DRINK_IMAGES = {
     alt: "Rich chocolate ice cream dessert",
   },
   signatureDoubleChocoCrunch: {
-    src: "/images/chc-gelato-img.jpeg",
+    src: "/images/16.png",
     alt: "Rich chocolate ice cream dessert",
   },
   signatureChocoCaramelDrip: {
-    src: "/images/chc-gelato-img.jpeg",
+    src: "/images/17.png",
     alt: "Chocolate drink with caramel drizzle",
   },
   signatureChocoCoffeeKick: {
@@ -32,15 +32,15 @@ export const DRINK_IMAGES = {
     alt: "Chocolate milkshake topped with cream",
   },
   ingredient: {
-    src: "/images/chc-milkshare-img.jpeg",
+    src: "/images/18.png",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   expresso: {
-    src: "/images/chc-milkshare-img.jpeg",
+    src: "/images/19.png",
     alt: "Cadbury Chocolate Espresso Milkshake",
   },
   milkshake: {
-    src: "/images/chc-milkshare-img.jpeg",
+    src: "/images/20.png",
     alt: "Cadbury Chocolate Caramel Milkshake",
   },
   alcoholInfusion: {
